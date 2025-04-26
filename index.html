@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/Styles/style.css">
+    <link rel="stylesheet" href="/Styles/popup.css">
+
+    </link>
+    <title>🃏Poker</title>
+</head>
+
+<body>
+    <header class="header-container">
+        <div class="slider-container">slider</div>
+        <p class="title">Texas hold'em </p>
+        <button class="info-btn"
+            style="font-size: 30px; text-align: center; background-color: rgb(255, 255, 255);">⚙️</button>
+    </header>
+    <div class="page-container">
+        <div class="middle-section">
+            <aside class="others-container">
+                <p class="player-count">Players:</p>
+                
+                <button  class="game-btn" value="2" id="add-bot" onclick="DealCards(value,this.id)">Add bot</button>
+            </aside>
+            <main class="game-container">
+                <p class="timer">clock:</p>
+                <p class="money-pot"> bet:</p>
+
+                <div class="community-card-container" id="community-container-id"></div>
+                <div class="player-card-container" id="player-container-id">
+                    <button class="game-btn" id="player-join"value="2" onclick="DealCards(value,this.id)">Join</button>
+                </div>
+                <div class="btn-container">
+                    <button class="game-btn" onclick="DisplayCard()">CHECK</button>
+                    <button class="game-btn">ADD</button>
+                    <button class="game-btn">FOLD</button>
+                </div>
+            </main>
+            <aside class="players-container">
+                <p style="margin-bottom: 15px;" 15px;>Info:</p>
+                <p style="text-align: left; margin: 0 0 15px 5px;">Name:</p>
+                <p style="text-align: left; margin: 0 0 15px 5px;">Money:</p>
+                <p style="text-align: left; margin: 0 0 15px 5px;">Debt:</p>
+            </aside>
+        </div>
+
+    </div>
+    <div class="popup-container" id="starting">
+        <div class="popup" id="start-game">
+            <p class="info-txt">Welcome to Texas hold 'em game</p>
+            <button class="start-btn" onclick="StartGame()">START</button>
+        </div>
+    </div>
+</body>
+<script type="module" src="script.js"></script>
+
+</html>
