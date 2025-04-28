@@ -1,0 +1,43 @@
+
+ceka 2 min i poziva funk igraj prvi (half-blind) pa (full-blind) 
+ako istekne 2 min prekida se place bet, da mu 15 sekunde i da placuje bet ako ne place ide auto fold
+
+kad se zavrsi sve zove funk check hands, ko ima najvecu ruku on je winner
+
+
+------------------------------------------------------------------------------------------------------------
+//GameLoop
+1. gameloop tera 1. igraca da postavi small blind bet (15 sec + bonus 10s)
+2. big blind bet za 2. igraca ,ako ima vise igraca: oni stavljaju betove 
+
+//GameState update
+3. pamtimo max bet
+
+//BetLoop
+4. vrtimo sve dok ne dodjemo do tog igraca koji je stavio max bet, ako ga niko u medjuvremenu zamenio
+
+//GameLoop
+5. postavljaju se 3 karte. Kraj flop.
+
+//GameLoop > BetLoop : set na 0 > GameLoop 4. karta
+6. max bet reset na 0, moze da se checkuje ili betuje ili folduje, ako neko betuje svako mora da ga mecuje ili folduje
+7. otkriva se 4. karta. Kraj the turn-a
+
+//GameLoop > BetLoop : set na 0 > GameLoop 4. karta
+8. isto kao 6 i 7. Kraj the river
+
+//GameLoop ili posebna funk
+9. SHOWDOWN
+
+//poziv funk CheckingHands
+10. Checking hands
+
+//Ovo bi trebalo da bude u GameLoop ili u CheckingHands
+11. payout
+
+12. ResetGame. D, SB, BB ++
+13. EndGame, sve se brise sa ekrana (karte, vreme, bet) izbacuju se botovi koji su na 0, reset gameState na "0", provera broja igraca
+14. StartGame
+------------------------------------------------------------------------------------------------------------
+
+

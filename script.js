@@ -1,6 +1,13 @@
 import { GameLoop } from "./functions/gameLogic.js";
 // clubs (♣), diamonds (♦), hearts (♥) and spades (♠)
 
+//#region Variables
+const Types = ["♣", "♠", "♦", "♥"];
+const CardNames = ["A" ,"J", "Q", "K"];
+const DisplayLoc = ["community-container-id", "player-container-id", "other-container-id"];
+const BotNames = ["Mark", "John", "Dave", "Martin", "Bob", "Steve"];
+const PlayerStatus = ["D", "SB", "BB"]
+
 let gameState = {
     deck: [],
     players: [],
@@ -11,14 +18,19 @@ let gameState = {
     playerCount: 0,
     CardsInHand: 2
 };
+//#endregion
+
+//#region Classes
 
 class playerObject {
-    constructor(cards, money, userID, name) {
+    constructor(cards, money, userID, name, debt, playerStatus) {
         gameState.playerCount++;
         this.Money = money ?? 1000;
         this.Cards = cards;
-        this.userID = userID ?? `Bot#${gameState.playerCount}`;
+        this.UserID = userID ?? `Bot#${gameState.playerCount}`;
         this.Name = name ?? `Player#${gameState.playerCount}`;
+        this.Debt = debt ?? 0;
+        this.PlayerStatus = playerStatus;
     }
 }
 
@@ -56,10 +68,7 @@ class cardObject {
     }
 }
 
-const Types = ["♣", "♠", "♦", "♥"];
-const CardNames = ["A" ,"J", "Q", "K"];
-const DisplayLoc = ["community-container-id", "player-container-id", "other-container-id"];
-const BotNames = ["Mark", "John", "Dave", "Martin", "Bob", "Steve"];
+//#endregion
 
 function GenerateDeck() {
     for (let index = 2; index <= 10; index++) {
@@ -93,17 +102,6 @@ function DisplayCard(containerCall) {
         return card;
     }
 }
-window.DisplayCard = DisplayCard;
-
-function StartGame() {
-    let popupBox = document.getElementById("starting");
-    popupBox.classList.add("loading-disabled");
-    GenerateDeck();
-    ShuffleDeck();
-    CommunityDeal(3);
-    GameLoop();
-}
-window.StartGame = StartGame;
 
 
 function AddBot(drawNum = 0, location) {
@@ -113,7 +111,7 @@ function AddBot(drawNum = 0, location) {
 
         let name = BotNames[Math.floor(Math.random() * 5)];
         let cards = CreateOthers(name);
-        let botObj = new playerObject(cards, undefined, undefined, name);
+        let botObj = new playerObject(cards, undefined, undefined, name, undefined, undefined);
         playerCount.innerText = "Players: " + gameState.playerCount + "/10";
         gameState.players.push(botObj);
 
@@ -124,7 +122,7 @@ function AddBot(drawNum = 0, location) {
         return;
     }
 }
-window.AddBot = AddBot;
+
 function PlayerJoin(drawNum = 0, location) {
     let playerCount = document.querySelector(".player-count");
     if (location === "player-join") {
@@ -136,7 +134,7 @@ function PlayerJoin(drawNum = 0, location) {
         }
         console.log(cards);
         //Player info won't be undefined once we add UUID and socket.io
-        let playerObj = new playerObject(cards, undefined, undefined, undefined);
+        let playerObj = new playerObject(cards, undefined, undefined, undefined, undefined,undefined );
         gameState.players.push(playerObj);
         playerCount.innerText = "Players: " + gameState.playerCount + "/10";
         let joinBtn = document.getElementById("player-join");
@@ -149,7 +147,6 @@ function PlayerJoin(drawNum = 0, location) {
         return;
     }
 }
-window.PlayerJoin = PlayerJoin;
 
 function CommunityDeal(drawNum = 1) {
     console.log("community cards: " + drawNum);
@@ -158,7 +155,6 @@ function CommunityDeal(drawNum = 1) {
     }
     //console.log(gameState.communityCards);
 }
-window.CommunityDeal = CommunityDeal;
 
 function CreateOthers(name) {
     let cards = [];
@@ -180,5 +176,21 @@ function CreateOthers(name) {
     cardContainer.appendChild(othersContainer);
     return cards;
 }
+
+
+function StartGame() {
+    let popupBox = document.getElementById("starting");
+    popupBox.classList.add("loading-disabled");
+    GenerateDeck();
+    ShuffleDeck();
+    //CommunityDeal(3);
+    GameLoop();
+}
+
+window.AddBot = AddBot;
+window.CommunityDeal = CommunityDeal;
+window.PlayerJoin = PlayerJoin;
+window.StartGame = StartGame;
+window.DisplayCard = DisplayCard;
 
 export { gameState, cardObject };
