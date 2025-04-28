@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/Styles/style.css">
     <link rel="stylesheet" href="/Styles/popup.css">
-
+    <script type="module" src="script.js"></script>
+    <script type="module" src="./functions/popupController.js"></script>
     </link>
     <title>🃏Poker</title>
 </head>
@@ -15,7 +16,7 @@
     <header class="header-container">
         <div class="slider-container">slider</div>
         <p class="title">Texas hold'em </p>
-        <button class="info-btn"
+        <button class="info-btn" onclick="SettingsPopup()"
             style="font-size: 30px; text-align: center; background-color: rgb(255, 255, 255);">⚙️</button>
     </header>
     <div class="page-container">
@@ -48,13 +49,12 @@
         </div>
 
     </div>
-    <div class="popup-container" id="starting">
-        <div class="popup" id="start-game">
+    <div class="popup-container" id="starting-container-id">
+        <div class="popup" id="start-popup-id">
             <p class="info-txt">Welcome to Texas hold 'em game</p>
-            <button class="start-btn" onclick="StartGame()">START</button>
+            <button class="start-btn" onclick="RemoveLoading()">START</button>
         </div>
     </div>
+    
 </body>
-<script type="module" src="script.js"></script>
-
 </html>

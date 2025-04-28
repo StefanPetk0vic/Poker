@@ -1,17 +1,40 @@
-import { gameState, cardObject } from "../script.js";
+import { gameState, cardObject, playerObject } from "../script.js";
 
-function GameLoop() {
-    
+let gameInterval = null;
+
+function MonitorPlayers() {
+    if (gameState.playerCount >= 2 && !gameState.isGameRunning) {
+        console.log("Game starting 2 or more joined...");
+        StartGameLoop()
+    } else {
+        console.log("Game already in session...");
+    }
 }
 
-function PlaceBet(){}
+function StartGameLoop() {
+    gameState.isGameRunning=true;
+    let DelayMultiplier = 1;
+    CommunityDeal(3);
+    gameState.players[gameState.playersPos].Cards.forEach(card => {
+        setTimeout(()=>{card.FlipCard()},DelayMultiplier*250);
+        DelayMultiplier++;
+    });
+    GameLoop();
 
-function CheckHands(){}
+}
 
-function ResetGame(){}
+function GameLoop() {
+    console.log("EVOOO MEEEE");
+}
+
+function PlaceBet() { }
+
+function CheckHands() { }
+
+function ResetGame() { }
 
 //opcioni com : botovi koji odu u - bice izbaceni iz gamea
-function EndGame(){}
+function EndGame() { }
 
 
 //ide od igraca do igraca i tera da donesu odluku
@@ -21,4 +44,4 @@ function EndGame(){}
 
 
 
-export {GameLoop}
+export { GameLoop, MonitorPlayers }

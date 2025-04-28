@@ -16,7 +16,9 @@
     left: 0;
     background-color:var(--background-opacity)
 }
-
+.settings{
+    background-color: rgba(25,25,25,0.5);
+}
 .popup {
     position: fixed;
     top: 30%;
@@ -48,4 +50,32 @@
 .loading-disabled{
     visibility: hidden;
     pointer-events: none;
+}
+
+:root{
+    --key-hover-background-color: rgb(188, 188, 188);
+    --key-background-color: rgb(251, 251, 251);
+    --key-border-color: rgb(133, 133, 133);
+    --key-color: rgb(0, 0, 0);
+}
+.main-btn {
+    border-radius: 7px;
+    display: inline-block;
+    border: 1.5px solid var(--key-border-color);
+    padding: 10px;
+    margin-bottom: 3px;
+    margin-top: 0px;
+    background-color: var(--key-background-color);
+    color: var(--key-color);
+
+    font-family: Roboto;
+    font-weight: 500;
+
+    cursor: pointer;
+
+}
+
+.main-btn:hover {
+    background-color: var(--key-hover-background-color);
+    transform: scale(1.1);
 }

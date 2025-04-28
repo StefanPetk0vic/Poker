@@ -112,31 +112,41 @@ input {
 
 .others-card-container {
     display: flex;
-    flex-wrap: wrap;  /* allow wrapping */
+    flex-wrap: wrap;
+    /* allow wrapping */
     justify-content: center;
     align-items: center;
     gap: 5px;
 }
-.others-card-container > p {
-    width: 100%; /* make <p> take full width */
-    text-align: center; /* optional: center text */
+
+.others-card-container>p {
+    width: 100%;
+    /* make <p> take full width */
+    text-align: center;
+    /* optional: center text */
 }
-.others-card-container > .cards{
+
+.others-card-container>.cards {
     width: 60px;
     height: 80px;
 }
-.others-card-container > .cards > .the-back{
+
+.others-card-container>.cards>.the-back {
     font-size: 10px;
 }
-.others-card-container > .cards > .the-front{
+
+.others-card-container>.cards>.the-front {
     font-size: 5px;
 }
-.others-card-container > .cards > .the-front > .updown-part{
+
+.others-card-container>.cards>.the-front>.updown-part {
     font-size: 15px;
 }
-.others-card-container > .cards > .the-front >.middle-part{
+
+.others-card-container>.cards>.the-front>.middle-part {
     font-size: 35px;
 }
+
 .cards {
     display: flex;
     justify-content: center;
@@ -146,35 +156,33 @@ input {
     color: black;
     border-radius: 15%;
     transform-style: preserve-3d;
-    transition: all 0.5s ease;
+    transition: transform 0.6s ease;
+    position: relative;
+    transform: rotateY(0deg);
 }
-
+.cards.flipped{
+transform: rotateY(180deg);
+}
+.the-front, .the-back {
+    border-radius: 15%;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    color: #333;
+    text-align: center;
+    font-family: 'Franklin Gothic Medium';
+    font-size: 20px;
+    font-weight: bold;
+}
 .the-back {
-    border-radius: 15%;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    backface-visibility: hidden;
-    background: #ebeaea;
-    color: #333;
-    text-align: center;
-    font-family: 'Franklin Gothic Medium';
-    font-size: 20px;
-    font-weight: bold;
+    background-color: #0e5a3c;
+    transform: rotateY(0deg);
 }
 
-.the-front {
-    border-radius: 15%;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    backface-visibility: hidden;
+.the-front{
     background: #16895b;
-    color: #333;
-    text-align: center;
-    font-family: 'Franklin Gothic Medium';
-    font-size: 20px;
-    font-weight: bold;
+    transform: rotateY(180deg);
 }
 
 .middle-part {
