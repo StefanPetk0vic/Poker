@@ -5,42 +5,70 @@ import { GameLoop, MonitorPlayers } from "./functions/gameLogic.js";
 const Types = ["♣", "♠", "♦", "♥"];
 const CardNames = ["A", "J", "Q", "K"];
 const DisplayLoc = ["community-container-id", "player-container-id", "other-container-id"];
-const BotNames = ["Mark", "John", "Dave", "Martin", "Bob", "Steve"];
-const PlayerStatus = ["D", "SB", "BB"]
+const BotNames = ["Mark", "John", "Dave", "Martin", "Bob", "Steve", "Sam", "Smith","Sarah","Lois","Park","Alex"];
 
 let gameState = {
+    //Deck - collection of shuffled cards. Max 52 cards
     deck: [],
-    players: [],
-    communityCards: [],
-    betSum: 0,
+    //currentPos -saves the current position in the deck
     currentPos: 0,
+    //Players - collection of players connected to this room
+    players: [],
+    //CommunityCards - collection of cards on the table for easier access
+    communityCards: [],
+    //betSum - total sum of money on the table
+    betSum: 0,
+    //playersPos - remembers the frontend users pos in the arr
     playersPos: null,
-    maxCards: 52,
+    //playerCount - easier access of the number of players in the game
     playerCount: 0,
+    //inCurrentGame -number of players in this game session
     inCurrentGame: 0,
+    //isGameRunning -flag for controlling if there is a game in session
     isGameRunning: false,
-    CardsInHand: 2
+    //firstToAct -set to 1 because the player[0] is the dealer. This is the Small Blind (SB) player the value can change
+    firstToAct: 1,
+    Dealer: 0,
+    NumOfFolds: 0
 };
 //#endregion
 
 //#region Classes
-
 class playerObject {
-    constructor(cards, money, userID, name, debt, playerStatus) {
-        onPlayerJoin();
+    constructor(cards, money, userID, name, debt) {
+        //Money - the players total money to spend
         this.Money = money ?? 1000;
+        //cards - the cards the player has in his hand
         this.Cards = cards;
-        this.UserID = userID ?? `Bot#${gameState.playerCount}`;
-        this.Name = name ?? `Player#${gameState.playerCount}`;
+        //UserID - UUID or preset botID 
+        this.UserID = userID ?? `Bot#${gameState.players.length}`;
+        //Name - Self given name or default player#number
+        this.Name = name ?? `Player#${gameState.players.length}`;
+        //Debt - still not realised but will be money that the player owes the "bank" and will payoff with every win 
+        //(scalable value from 25% to 50% of winning earnings)
         this.Debt = debt ?? 0;
-        this.PlayerStatus = playerStatus;
+        //HasFolded - flag used for filtering out players in a game that are still playing
+        this.HasFolded = false;
+        //Bet - money that the player has placed in that round
+        this.Bet = 0;
+        //IsBot - flag used to check if a player is a bot or not
+        //(used for the betting logic)
+        this.IsBot = null;
+        this.DebugColor = GenerateColor();
     }
 }
-
+function GenerateColor() {
+    let r = 100+Math.floor(Math.random()*155);
+    let g = 100+Math.floor(Math.random()*155);
+    let b = 100+Math.floor(Math.random()*155);
+    return `rgb(${r},${g},${b})`;
+}
 class cardObject {
     constructor(name, type) {
         this._name = name;
         this._type = type;
+        this._frontParts = [];
+        this._flipped = false;
 
         const cardDiv = document.createElement('div');
         cardDiv.classList.add("cards");
@@ -53,7 +81,6 @@ class cardObject {
 
         cardDiv.appendChild(theBack);
         cardDiv.appendChild(theFront);
-        this._frontParts = [];
         for (let index = 0; index < 3; index++) {
             let frontFace = document.createElement('div');
             if (index == 1) {
@@ -65,10 +92,9 @@ class cardObject {
             theFront.appendChild(frontFace);
 
         }
-
-
         this.element = cardDiv;
     }
+
     FlipCard() {
         this._frontParts.forEach(parts => {
             if (parts.classList.contains('updown-part')) {
@@ -81,6 +107,7 @@ class cardObject {
             }
         });
         this.element.classList.toggle('flipped');
+        this._flipped = true;
     }
     get Name() {
         return this._name;
@@ -88,6 +115,10 @@ class cardObject {
     get Type() {
         return this._type;
     }
+    get Flipped() {
+        return this._flipped;
+    }
+
     set Name(newName) {
         this._name = newName;
         this._frontParts.forEach(parts => {
@@ -104,32 +135,34 @@ class cardObject {
             }
         });
     }
-
 }
 
 function onPlayerJoin() {
-    gameState.playerCount++;
+    //gameState.playerCount++;
     MonitorPlayers();
 }
+
 function onPlayerLeave() {
-    gameState.playerCount--;
+    //gameState.playerCount--;
     MonitorPlayers();
 }
-
-
 //#endregion
 
 function ShowCards() {
     gameState.players.forEach(player => {
         player.Cards.forEach(card => {
-            card.FlipCard();
+            if (!card.Flipped) {
+                card.FlipCard();
+
+            }
         })
     })
     gameState.communityCards.forEach(card => {
-        card.FlipCard();
+        if (!card.Flipped) {
+            card.FlipCard();
+        }
     })
 }
-window.ShowCards = ShowCards;
 
 function GenerateDeck() {
     for (let index = 2; index <= 10; index++) {
@@ -155,7 +188,7 @@ function ShuffleDeck() {
 
 function DisplayCard(containerCall) {
     let card = gameState.deck[gameState.currentPos++];
-    if (gameState.currentPos < gameState.maxCards) {
+    if (gameState.currentPos < gameState.deck.length) {
         if (containerCall) {
             let cardContainer = document.getElementById(containerCall);
             cardContainer.appendChild(card.element);
@@ -175,12 +208,15 @@ function PlayerJoin(drawNum = 0, location) {
         }
         //Player info won't be undefined once we add UUID and socket.io
         let playerObj = new playerObject(cards, undefined, undefined, undefined, undefined, undefined);
+        playerObj.IsBot = false;
         gameState.players.push(playerObj);
-        gameState.playersPos = gameState.players.length - 1;
-        playerCount.innerText = "Players: " + gameState.playerCount + "/10";
+        gameState.playersPos = gameState.players.length-1;
+        console.log("EVOOO MEEE "+gameState.players.length);
+        
+        playerCount.innerText = "Players: " + gameState.players.length + "/10";
         let joinBtn = document.getElementById("player-join");
         joinBtn.remove();
-
+        onPlayerJoin();
         //console.log("Players in this room: "+gameState.players);
     }
     else {
@@ -189,26 +225,49 @@ function PlayerJoin(drawNum = 0, location) {
     }
 }
 
-function CommunityDeal(drawNum = 1) {
+async function CommunityDeal(drawNum = 1) {
     console.log("community cards: " + drawNum);
+    const flipPromises = [];
+    if(drawNum === 1){
+        return new Promise(resolve=>{
+            gameState.communityCards.push(DisplayCard(DisplayLoc[0]));
+            setTimeout(()=>{
+                gameState.communityCards[gameState.communityCards.length-1].FlipCard();
+                resolve();
+            },300);
+            return;
+        });
+    }
     for (let i = 1; i <= drawNum; i++) {
         gameState.communityCards.push(DisplayCard(DisplayLoc[0]));
-        setTimeout(()=>{gameState.communityCards[i-1].FlipCard()},300*i);
+        
+        // Create a Promise for each timeout to flip the card
+        const flipPromise = new Promise(resolve => {
+            setTimeout(() => {
+                gameState.communityCards[i - 1].FlipCard();
+                resolve();  // Resolve the Promise once the card is flipped
+            }, 300 * i);  // Simulated delay
+        });
+
+        flipPromises.push(flipPromise);  // Store the Promise for each card
     }
-    //console.log(gameState.communityCards);
+    // Wait for all the flips to complete
+    await Promise.all(flipPromises);
 }
+
 
 function AddBot(drawNum = 0, location) {
     let playerCount = document.querySelector(".player-count");
     if (location === "add-bot" && gameState.playerCount < 9) {
         console.log("Adding a bot with:" + drawNum + "cards");
 
-        let name = BotNames[Math.floor(Math.random() * 5)];
+        let name = BotNames[Math.floor(Math.random() * BotNames.length)];
         let cards = CreateOthers(name);
         let botObj = new playerObject(cards, undefined, undefined, name, undefined, undefined);
-        playerCount.innerText = "Players: " + gameState.playerCount + "/10";
+        botObj.IsBot = true;
         gameState.players.push(botObj);
-
+        playerCount.innerText = "Players: " + gameState.players.length + "/10";
+        onPlayerJoin();
         //console.log(gameState.players);
     }
     else {
@@ -250,5 +309,6 @@ window.AddBot = AddBot;
 window.CommunityDeal = CommunityDeal;
 window.PlayerJoin = PlayerJoin;
 window.DisplayCard = DisplayCard;
+window.ShowCards = ShowCards;
 
 export { gameState, cardObject, ShowCards, playerObject };
