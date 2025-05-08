@@ -230,11 +230,87 @@ function getPlayerAction(player, maxBet, FirstRound) {
             }
         }
         else{
-            //Players actions go here
-            //The frontend user
+
+            ShowPlayerButtons();
+
+            const callBtn = document.getElementById('call-btn-id');
+            const raiseBtn = document.getElementById('raise-btn-id');
+            const foldBtn = document.getElementById('fold-btn-id');
+
+            function cleanUp()
+            {
+                callBtn.removeEventListener('click', onCall);
+                raiseBtn.removeEventListener('click', onRaise);
+                foldBtn.removeEventListener('click', onFold);
+            }
+
+            function onCall()
+            {
+                cleanUp();
+                HidePlayerButtons();
+                console.log("You have called.");
+                resolve({action:'call', amount: maxBet});
+            }
+
+            function onRaise()
+            {
+                cleanUp()
+
+                let amount;
+
+                while(true)
+                {
+                    amount = prompt("Enter your raise amount:");
+                    amount = parseInt(amount);
+
+                    if(isNaN(amount)) alert("Invalid raise amount. Not a number.");
+                    else if(amount <=maxBet) alert("Invalid raise amount. Not a number.");
+                    else break;
+                }
+                HidePlayerButtons();
+                console.log("You have raised to " + amount);
+                resolve({action: 'raise', amount: amount});
+            }
+
+            function onFold()
+            {
+                cleanUp();
+                HidePlayerButtons();
+                console.log("You have folded");
+                resolve({action:'fold', amount: 0});
+            }
+            
+            callBtn.addEventListener('click', onCall);
+            raiseBtn.addEventListener('click', onRaise);
+            foldBtn.addEventListener('click', onFold);
+
+
         }
     })
 }
+
+function ShowPlayerButtons() {
+    const callBtn = document.getElementById('call-btn-id');
+    const raiseBtn = document.getElementById('raise-btn-id');
+    const foldBtn = document.getElementById('fold-btn-id');
+
+    callBtn.style.display = 'block';
+    raiseBtn.style.display = 'block';
+    foldBtn.style.display = 'block';
+
+}
+
+function HidePlayerButtons() {
+    const callBtn = document.getElementById('call-btn-id');
+    const raiseBtn = document.getElementById('raise-btn-id');
+    const foldBtn = document.getElementById('fold-btn-id');
+
+    callBtn.style.display = 'none';
+    raiseBtn.style.display = 'none';
+    foldBtn.style.display = 'none';
+}
+
+
 function RoundSpeed(Active = true) {
     if(Active){
         return 1000 + Math.floor(Math.random() * 5000);

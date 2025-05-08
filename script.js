@@ -217,12 +217,55 @@ function PlayerJoin(drawNum = 0, location) {
         let joinBtn = document.getElementById("player-join");
         joinBtn.remove();
         onPlayerJoin();
-        //console.log("Players in this room: "+gameState.players);
+
+        CreatePlayerButtons();
+        
     }
     else {
         console.warn("Something went wrong in player-join.");
         return;
     }
+}
+
+function CreatePlayerButtons()
+{
+    const btnContainer = document.getElementById('player-btn-container-id');
+
+    const callBtn = document.createElement('button');
+    callBtn.className = 'game-btn';
+    callBtn.id = 'call-btn-id';
+    callBtn.innerText = 'CALL';
+
+    const raiseBtn = document.createElement('button');
+    raiseBtn.className = 'game-btn';
+    raiseBtn.id = 'raise-btn-id';
+    raiseBtn.innerText = 'RAISE';
+
+    const foldBtn = document.createElement('button');
+    foldBtn.className = 'game-btn';
+    foldBtn.id = 'fold-btn-id';
+    foldBtn.innerText = 'FOLD';
+
+    btnContainer.appendChild(callBtn);
+    btnContainer.appendChild(raiseBtn);
+    btnContainer.appendChild(foldBtn);
+
+    callBtn.addEventListener('click', () => {
+        console.log('CALL clicked');
+        // resolve the action or trigger game logic here
+    });
+    
+    raiseBtn.addEventListener('click', () => {
+        console.log('RAISE clicked');
+    });
+    
+    foldBtn.addEventListener('click', () => {
+        console.log('FOLD clicked');
+    });
+
+    callBtn.style.display = 'none';
+    raiseBtn.style.display = 'none';
+    foldBtn.style.display = 'none';
 }
 
 async function CommunityDeal(drawNum = 1) {
