@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/Styles/style.css">
     <link rel="stylesheet" href="/Styles/popup.css">
+    <link rel="stylesheet" href="/Styles/actionbubble.css">
     <script type="module" src="script.js"></script>
     <script type="module" src="./functions/popupController.js"></script>
     </link>
@@ -21,21 +22,25 @@
     </header>
     <div class="page-container">
         <div class="middle-section">
-            <aside class="others-container">
+
+            <div class="others-container">
                 <p class="player-count">Players:</p>
                 
                 <button  class="game-btn" value="2" id="add-bot" onclick="AddBot(value,this.id)">Add bot</button>
-            </aside>
+            </div>
             <main class="game-container">
-                <p class="timer">clock:</p>
-                <p class="money-pot"> bet:</p>
+                <div class="poker-table">
 
-                <div class="community-card-container" id="community-container-id"></div>
-                <div class="player-card-container" id="player-container-id">
-                    <button class="game-btn" id="player-join"value="2" onclick="PlayerJoin(value,this.id)">Join</button>
+                    <p class="timer">clock:</p>
+                    <p class="money-pot"> bet:</p>
+
+                    <div class="community-card-container" id="community-container-id"></div>
+                    <div class="player-card-container" id="player-container-id">
+                        <button class="game-btn" id="player-join"value="2" onclick="PlayerJoin(value,this.id)">Join</button>
+                    </div>
+                    </div>
                 </div>
-                <div class="btn-container" id="player-btn-container-id">
-                </div>
+                <div class="btn-container" id="player-btn-container-id"></div>
             </main>
             <aside class="players-container">
                 <p style="margin-bottom: 15px;" 15px;>Info:</p>

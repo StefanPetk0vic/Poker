@@ -1,0 +1,29 @@
+.bubble {
+	position: relative;
+	background: #ffffff;
+    font-size: 20px;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 16px;
+    color: black;
+	border-radius: 20px;
+    left: 70px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+.bubble:after {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 50%;
+	width: 0;
+	height: 0;
+	border: 20px solid transparent;
+	border-bottom-color: #ffffff;
+	border-top: 0;
+	border-left: 0;
+	margin-left: -10px;
+	margin-top: -15px;
+}

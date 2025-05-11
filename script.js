@@ -5,7 +5,7 @@ import { GameLoop, MonitorPlayers } from "./functions/gameLogic.js";
 const Types = ["♣", "♠", "♦", "♥"];
 const CardNames = ["A", "J", "Q", "K"];
 const DisplayLoc = ["community-container-id", "player-container-id", "other-container-id"];
-const BotNames = ["Mark", "John", "Dave", "Martin", "Bob", "Steve", "Sam", "Smith","Sarah","Lois","Park","Alex"];
+let BotNames = ["Mark", "John", "Dave", "Martin", "Bob", "Steve", "Sam", "Smith","Sarah","Lois","Park","Alex"];
 
 let gameState = {
     //Deck - collection of shuffled cards. Max 52 cards
@@ -305,7 +305,10 @@ function AddBot(drawNum = 0, location) {
         console.log("Adding a bot with:" + drawNum + "cards");
 
         let name = BotNames[Math.floor(Math.random() * BotNames.length)];
-        let cards = CreateOthers(name);
+        RemoveBotName(name);
+
+        let cards = CreateOthers(name);// sa strane
+        
         let botObj = new playerObject(cards, undefined, undefined, name, undefined, undefined);
         botObj.IsBot = true;
         gameState.players.push(botObj);
@@ -316,6 +319,14 @@ function AddBot(drawNum = 0, location) {
     else {
         console.warn("Something went wrong in bot-join.");
         return;
+    }
+}
+
+function RemoveBotName(name)
+{
+    let index = BotNames.indexOf(name);
+    if (index !== -1) {
+    BotNames.splice(index, 1); // removes 1 element at the found index
     }
 }
 
@@ -347,6 +358,22 @@ function RemoveLoading() {
     ShuffleDeck();
 }
 
+function getCards(index)
+{
+    return gameState.players[index].Cards;
+}
+
+function getName(index)
+{
+    return gameState.players[index].Name;
+}
+
+function getMoney(index)
+{
+    return gameState.players[index].Money;
+}
+
+
 window.RemoveLoading = RemoveLoading;
 window.AddBot = AddBot;
 window.CommunityDeal = CommunityDeal;
@@ -354,4 +381,4 @@ window.PlayerJoin = PlayerJoin;
 window.DisplayCard = DisplayCard;
 window.ShowCards = ShowCards;
 
-export { gameState, cardObject, ShowCards, playerObject };
+export { gameState, cardObject, ShowCards, playerObject, getCards, getName, getMoney };

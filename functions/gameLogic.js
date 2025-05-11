@@ -1,4 +1,5 @@
 import { gameState, cardObject, playerObject } from "../script.js";
+import { createPlayers } from "../addPlayers.js";
 
 const _FALSE = false;
 const _TRUE = true;
@@ -20,6 +21,11 @@ function StartGameLoop() {
     const startBtn = document.querySelector('#community-container-id .main-btn');
     if (startBtn) startBtn.remove();
 
+    RemoveJoinButton();
+
+    createPlayers(gameState.players.length);
+    console.log("trying");
+
     gameState.isGameRunning = true;
     let DelayMultiplier = 1;
     if (gameState.playersPos != undefined) {
@@ -29,6 +35,14 @@ function StartGameLoop() {
         });
     }
     GameLoop();
+}
+
+function RemoveJoinButton()
+{
+    const playerJoinButton = document.getElementById('player-join');
+    if (playerJoinButton) {
+        playerJoinButton.style.display = 'none';
+    }
 }
 
 async function GameLoop() {
@@ -200,6 +214,7 @@ function getPlayerAction(player, maxBet, FirstRound) {
         const callActions = ['raise', 'call', 'fold', 'call', 'call', 'call'];
         if (player.IsBot) {
             const action = callActions[Math.floor(Math.random() * callActions.length)];
+            ShowAction(action, player.Name);
             if (maxBet < 2 && FirstRound) {
                 let amount = maxBet + 1;
                 setTimeout(() => { resolve({ action: callActions[0], amount: amount }); }, RoundSpeed());
@@ -289,6 +304,22 @@ function getPlayerAction(player, maxBet, FirstRound) {
     })
 }
 
+function ShowAction(action, Name)
+{
+    let bubbleId=`bubble-${Name}`;
+    let bubbleElement = document.getElementById(bubbleId);
+
+    bubbleElement.textContent = action; 
+    bubbleElement.style.opacity=100;
+
+    setTimeout(function () {
+            bubbleElement.style.opacity = '0';
+        }, 1000);
+
+    
+}
+    
+
 function ShowPlayerButtons() {
     const callBtn = document.getElementById('call-btn-id');
     const raiseBtn = document.getElementById('raise-btn-id');
@@ -313,7 +344,8 @@ function HidePlayerButtons() {
 
 function RoundSpeed(Active = true) {
     if(Active){
-        return 1000 + Math.floor(Math.random() * 5000);
+        //return 1000 + Math.floor(Math.random() * 5000); mnnogo sporo cekam celu vecnost
+        return 1000;
     }
     return 0;
 }
@@ -342,6 +374,7 @@ async function EndGame() {
 }
 
 
+
 //ide od igraca do igraca i tera da donesu odluku
 //event listener ceka da se izvrsi neka od 3 funk i tako u krug za sve
 
@@ -349,4 +382,4 @@ async function EndGame() {
 
 
 
-export { GameLoop, MonitorPlayers }
+export { GameLoop, MonitorPlayers,  }
