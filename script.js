@@ -41,7 +41,7 @@ class playerObject {
         //cards - the cards the player has in his hand
         this.Cards = cards;
         //UserID - UUID or preset botID 
-        this.UserID = userID ?? `Bot#${gameState.players.length}`;
+        this.UserID = userID;
         //Name - Self given name or default player#number
         this.Name = name ?? `Player#${gameState.players.length}`;
         //Debt - still not realised but will be money that the player owes the "bank" and will payoff with every win 
@@ -203,14 +203,21 @@ function PlayerJoin(drawNum = 0, location) {
         console.log("Player joining with: " + drawNum + " cards");
         let cards = [];
         for (let i = 0; i < drawNum; i++) {
-            let drawnCard = DisplayCard(DisplayLoc[1]);
-            cards.push(drawnCard);
+            //let drawnCard = DisplayCard(DisplayLoc[1]); ??? jel ovo nekako dodaje karte ne kapiram 
+            //cards.push(drawnCard);
         }
+
+        for (let i = 0; i < 2; i++) {
+            let cardObj = DisplayCard(undefined);
+            cards.push(cardObj);
+            //othersContainer.appendChild(cards[i].element);
+        }
+
         //Player info won't be undefined once we add UUID and socket.io
-        let playerObj = new playerObject(cards, undefined, undefined, undefined, undefined, undefined);
+        let playerObj = new playerObject(cards, undefined, undefined, "ME", undefined);
         playerObj.IsBot = false;
         gameState.players.push(playerObj);
-        gameState.playersPos = gameState.players.length-1;
+        gameState.playersPos = playerObj.userID;
         console.log("EVOOO MEEE "+gameState.players.length);
         
         playerCount.innerText = "Players: " + gameState.players.length + "/10";
@@ -308,8 +315,10 @@ function AddBot(drawNum = 0, location) {
         RemoveBotName(name);
 
         let cards = CreateOthers(name);// sa strane
+
+        let userID = gameState.players.length;
         
-        let botObj = new playerObject(cards, undefined, undefined, name, undefined, undefined);
+        let botObj = new playerObject(cards, undefined, userID, name, undefined, undefined);
         botObj.IsBot = true;
         gameState.players.push(botObj);
         playerCount.innerText = "Players: " + gameState.players.length + "/10";
@@ -334,7 +343,7 @@ function CreateOthers(name) {
     let cards = [];
     let cardContainer = document.querySelector(".others-container");
     let othersContainer = document.createElement('div');
-    othersContainer.classList.add("others-card-container");
+    //othersContainer.classList.add("others-card-container");
     othersContainer.id = 'other-container-id';
 
     let userP = document.createElement('p');
@@ -345,7 +354,7 @@ function CreateOthers(name) {
     for (let i = 0; i < 2; i++) {
         let cardObj = DisplayCard(undefined);
         cards.push(cardObj);
-        othersContainer.appendChild(cards[i].element);
+        //othersContainer.appendChild(cards[i].element);
     }
     cardContainer.appendChild(othersContainer);
     return cards;
@@ -373,6 +382,11 @@ function getMoney(index)
     return gameState.players[index].Money;
 }
 
+function getUserID(index)
+{
+    return gameState.players[index].UserID;
+}
+
 
 window.RemoveLoading = RemoveLoading;
 window.AddBot = AddBot;
@@ -381,4 +395,4 @@ window.PlayerJoin = PlayerJoin;
 window.DisplayCard = DisplayCard;
 window.ShowCards = ShowCards;
 
-export { gameState, cardObject, ShowCards, playerObject, getCards, getName, getMoney };
+export { gameState, cardObject, ShowCards, playerObject, getCards, getName, getMoney, getUserID };
