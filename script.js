@@ -5,7 +5,7 @@ import { GameLoop, MonitorPlayers } from "./functions/gameLogic.js";
 const Types = ["♣", "♠", "♦", "♥"];
 const CardNames = ["A", "J", "Q", "K"];
 const DisplayLoc = ["community-container-id", "player-container-id", "other-container-id"];
-let BotNames = ["Mark", "John", "Dave", "Martin", "Bob", "Steve", "Sam", "Smith","Sarah","Lois","Park","Alex"];
+let BotNames = ["Mark", "John", "Dave", "Martin", "Bob", "Steve", "Sam", "Smith", "Sarah", "Lois", "Park", "Alex"];
 
 let gameState = {
     //Deck - collection of shuffled cards. Max 52 cards
@@ -21,7 +21,7 @@ let gameState = {
     //playersPos - remembers the frontend users pos in the arr
     playersPos: null,
     //playerCount - easier access of the number of players in the game
-    playerCount: 0,
+    playerCount: 9,
     //inCurrentGame -number of players in this game session
     inCurrentGame: 0,
     //isGameRunning -flag for controlling if there is a game in session
@@ -44,6 +44,7 @@ class playerObject {
         this.UserID = userID ?? `Bot#${gameState.players.length}`;
         //Name - Self given name or default player#number
         this.Name = name ?? `Player#${gameState.players.length}`;
+        this.BestHand = undefined;
         //Debt - still not realised but will be money that the player owes the "bank" and will payoff with every win 
         //(scalable value from 25% to 50% of winning earnings)
         this.Debt = debt ?? 0;
@@ -58,20 +59,22 @@ class playerObject {
     }
 }
 function GenerateColor() {
-    let r = 100+Math.floor(Math.random()*155);
-    let g = 100+Math.floor(Math.random()*155);
-    let b = 100+Math.floor(Math.random()*155);
+    let r = 100 + Math.floor(Math.random() * 155);
+    let g = 100 + Math.floor(Math.random() * 155);
+    let b = 100 + Math.floor(Math.random() * 155);
     return `rgb(${r},${g},${b})`;
 }
 class cardObject {
     constructor(name, type) {
         this._name = name;
         this._type = type;
+        this._fontColor = (type ===  "♦" || type === "♥") ? "red" : "black";
         this._frontParts = [];
         this._flipped = false;
 
         const cardDiv = document.createElement('div');
         cardDiv.classList.add("cards");
+        
 
         const theBack = document.createElement('div');
         theBack.classList.add('the-back');
@@ -99,11 +102,13 @@ class cardObject {
         this._frontParts.forEach(parts => {
             if (parts.classList.contains('updown-part')) {
                 parts.innerText = this._name;
+                parts.style.color = this._fontColor;
             }
         });
         this._frontParts.forEach(parts => {
             if (parts.classList.contains('middle-part')) {
                 parts.innerText = this._type;
+                parts.style.color = this._fontColor;
             }
         });
         this.element.classList.toggle('flipped');
@@ -117,6 +122,9 @@ class cardObject {
     }
     get Flipped() {
         return this._flipped;
+    }
+    get FontColor() {
+        return this._fontColor;
     }
 
     set Name(newName) {
@@ -210,16 +218,17 @@ function PlayerJoin(drawNum = 0, location) {
         let playerObj = new playerObject(cards, undefined, undefined, undefined, undefined, undefined);
         playerObj.IsBot = false;
         gameState.players.push(playerObj);
-        gameState.playersPos = gameState.players.length-1;
-        console.log("EVOOO MEEE "+gameState.players.length);
-        
+        gameState.playersPos = gameState.players.length - 1;
+        gameState.playerCount++;
+        console.log("EVOOO MEEE " + gameState.players.length);
+
         playerCount.innerText = "Players: " + gameState.players.length + "/10";
         let joinBtn = document.getElementById("player-join");
         joinBtn.remove();
         onPlayerJoin();
 
         CreatePlayerButtons();
-        
+
     }
     else {
         console.warn("Something went wrong in player-join.");
@@ -227,8 +236,7 @@ function PlayerJoin(drawNum = 0, location) {
     }
 }
 
-function CreatePlayerButtons()
-{
+function CreatePlayerButtons() {
     const btnContainer = document.getElementById('player-btn-container-id');
 
     const callBtn = document.createElement('button');
@@ -254,11 +262,11 @@ function CreatePlayerButtons()
         console.log('CALL clicked');
         // resolve the action or trigger game logic here
     });
-    
+
     raiseBtn.addEventListener('click', () => {
         console.log('RAISE clicked');
     });
-    
+
     foldBtn.addEventListener('click', () => {
         console.log('FOLD clicked');
     });
@@ -271,19 +279,19 @@ function CreatePlayerButtons()
 async function CommunityDeal(drawNum = 1) {
     console.log("community cards: " + drawNum);
     const flipPromises = [];
-    if(drawNum === 1){
-        return new Promise(resolve=>{
+    if (drawNum === 1) {
+        return new Promise(resolve => {
             gameState.communityCards.push(DisplayCard(DisplayLoc[0]));
-            setTimeout(()=>{
-                gameState.communityCards[gameState.communityCards.length-1].FlipCard();
+            setTimeout(() => {
+                gameState.communityCards[gameState.communityCards.length - 1].FlipCard();
                 resolve();
-            },300);
+            }, 300);
             return;
         });
     }
     for (let i = 1; i <= drawNum; i++) {
         gameState.communityCards.push(DisplayCard(DisplayLoc[0]));
-        
+
         // Create a Promise for each timeout to flip the card
         const flipPromise = new Promise(resolve => {
             setTimeout(() => {
@@ -301,20 +309,25 @@ async function CommunityDeal(drawNum = 1) {
 
 function AddBot(drawNum = 0, location) {
     let playerCount = document.querySelector(".player-count");
-    if (location === "add-bot" && gameState.playerCount < 9) {
-        console.log("Adding a bot with:" + drawNum + "cards");
+    
+    if (location === "add-bot") {
+        if ((gameState.playerCount - gameState.players.length ) > 0) {
+           
+            let name = BotNames[Math.floor(Math.random() * BotNames.length)];
+            RemoveBotName(name);
 
-        let name = BotNames[Math.floor(Math.random() * BotNames.length)];
-        RemoveBotName(name);
+            let cards = CreateOthers(name);// sa strane
 
-        let cards = CreateOthers(name);// sa strane
-        
-        let botObj = new playerObject(cards, undefined, undefined, name, undefined, undefined);
-        botObj.IsBot = true;
-        gameState.players.push(botObj);
-        playerCount.innerText = "Players: " + gameState.players.length + "/10";
-        onPlayerJoin();
-        //console.log(gameState.players);
+            let botObj = new playerObject(cards, undefined, undefined, name, undefined, undefined);
+            botObj.IsBot = true;
+            gameState.players.push(botObj);
+            playerCount.innerText = "Players: " + gameState.players.length + "/10";
+            onPlayerJoin();
+        }
+        else {
+            console.log("Max slots filled.");
+            return;
+        }
     }
     else {
         console.warn("Something went wrong in bot-join.");
@@ -322,11 +335,11 @@ function AddBot(drawNum = 0, location) {
     }
 }
 
-function RemoveBotName(name)
-{
+
+function RemoveBotName(name) {
     let index = BotNames.indexOf(name);
     if (index !== -1) {
-    BotNames.splice(index, 1); // removes 1 element at the found index
+        BotNames.splice(index, 1); // removes 1 element at the found index
     }
 }
 
@@ -358,18 +371,15 @@ function RemoveLoading() {
     ShuffleDeck();
 }
 
-function getCards(index)
-{
+function getCards(index) {
     return gameState.players[index].Cards;
 }
 
-function getName(index)
-{
+function getName(index) {
     return gameState.players[index].Name;
 }
 
-function getMoney(index)
-{
+function getMoney(index) {
     return gameState.players[index].Money;
 }
 
