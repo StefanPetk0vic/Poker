@@ -47,7 +47,9 @@ function StartGameLoop() {
             DelayMultiplier++;
         });
     }
+    
     GameLoop();
+
 }
 
 function RemoveJoinButton() {
@@ -59,6 +61,7 @@ function RemoveJoinButton() {
 
 async function GameLoop() {
     await new Promise(resolve => { setTimeout(resolve, 1500) });
+    console.log(gameState.players);
     await PlaceBets(true);
     await CommunityDeal(3);
 
@@ -234,7 +237,7 @@ async function PlaceBets(FirstRound = false) {
 
 function getPlayerAction(player, maxBet, FirstRound) {
     return new Promise(resolve => {
-        const callActions = ['raise', 'call', 'fold'];
+        const callActions = ['raise', 'call', 'fold','call','call','call'];
         if (player.IsBot) {
             const action = callActions[Math.floor(Math.random() * callActions.length)];
             
@@ -414,7 +417,7 @@ function HidePlayerButtons() {
 
 function RoundSpeed(Active = true) {
     if (Active) {
-        return 1000 + Math.floor(Math.random() * 3000);
+        return 1000 + Math.floor(Math.random() * 1500);
         //u tome je i stvar dumbass da "razmisle" botovi.
         //Ako zelis quick round onda stavi na false da ga ubrzas
         // _FALSE i _TRUE da ga lakse nadjes i menjas

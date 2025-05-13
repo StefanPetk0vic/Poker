@@ -22,6 +22,8 @@ let gameState = {
     playersPos: null,
     //playerCount - easier access of the number of players in the game
     playerCount: 9,
+    //playersJoin - used to remove bots and place real people in there place
+    playersJoin:0,
     //inCurrentGame -number of players in this game session
     inCurrentGame: 0,
     //isGameRunning -flag for controlling if there is a game in session
@@ -225,7 +227,8 @@ function PlayerJoin(drawNum = 0, location) {
         let playerObj = new playerObject(cards, undefined, undefined, "ME", undefined);
         playerObj.IsBot = false;
         gameState.players.push(playerObj);
-        gameState.playersPos = playerObj.userID;
+        gameState.playersPos = playerObj.UserID;
+        gameState.playersJoin +=1;
         console.log("EVOOO MEEE "+gameState.players.length);
         
         playerCount.innerText = "Players: " + gameState.players.length + "/10";
@@ -317,7 +320,7 @@ function AddBot(drawNum = 0, location) {
     let playerCount = document.querySelector(".player-count");
     
     if (location === "add-bot") {
-        if ((gameState.playerCount - gameState.players.length ) > 0) {
+        if ((gameState.playerCount - gameState.players.length + gameState.playersJoin) > 0) {
            
             let name = BotNames[Math.floor(Math.random() * BotNames.length)];
             RemoveBotName(name);
