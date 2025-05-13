@@ -4,10 +4,10 @@
 }
 
 body {
-    overflow-y: hidden;
     font-family: Roboto;
     font-size: 30px;
-    background-color: var(--body-background-color);
+    background: linear-gradient(to bottom, #371a46 0%, #000000 100%);
+
 }
 
 p {
@@ -29,6 +29,7 @@ input {
 
 .middle-section {
     display: flex;
+    flex-direction: row;
     gap: 20px;
     margin-top: 10px;
 }
@@ -57,9 +58,17 @@ input {
     display: flex;
     height: 100px;
     width: 100vw;
-    background-color: red;
+    font-weight: 1000;
     align-items: center;
     justify-content: space-between;
+}
+
+.title {
+    font-size: 2.5rem;           /* Make it significantly bigger */
+    letter-spacing: 2px;         /* Add breathing room between letters */
+    text-shadow: 2px 2px 5px #000; /* Add depth with shadow */
+    color: #ffffff;              /* Use a gold color for luxurious contrast */
+    margin: 0 auto;              /* Center it visually if space allows */
 }
 
 .game-container {
@@ -72,7 +81,7 @@ input {
     height: 75vh;
     box-shadow: none;
     border-radius: 15px;
-    background-color: rgb(137, 137, 255);
+
 }
 
 .poker-table {
@@ -110,9 +119,9 @@ input {
     justify-content: center;
     gap: 10px;
     width: 100%;
-    height: 60%;
+    height: 140px;
     border-radius: 10px 10px 0px 0px;
-
+    
     position: absolute;
     top: 50%; 
     left: 50%; 
@@ -136,7 +145,37 @@ input {
     align-items: center;
     justify-content: center;
     gap: 0px;
+    
 
+}
+
+.table-player-info {
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0px;
+}
+
+.turn-indicator {
+    position: absolute;
+    width: 150px;
+    height: 20px;
+    border-radius: 50%;
+    border: 3px solid rgba(0, 255, 0, 0.7);
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.7);
+    z-index: 0;
+}
+
+.table-player-container.folded::after {
+  content: "FOLDED";
+  top: 15%;
+  font-size: 30px;
+  font-weight: 600;
+  color: #ffffff;
+  position: absolute;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7)
 }
 
 .table-player-money {
@@ -149,6 +188,9 @@ input {
     padding-left: 50px;
     padding-right: 50px;
     border: 3px solid black;
+    width: 30px;
+    height: 17px;
+    text-align: center;
 }
 
 .table-player-username {
@@ -228,7 +270,7 @@ input {
     justify-content: center;
     align-items: center;
     width: 100px;
-    height: 155px;
+    height: 100%;
     color: black;
     
     border-radius: 15%;
@@ -237,6 +279,8 @@ input {
     position: relative;
     transform: rotateY(0deg);
 }
+
+
 .cards.flipped{
     transform: rotateY(180deg);
     border: unset;
@@ -250,7 +294,7 @@ input {
     color: #333;
     text-align: center;
     font-family: 'Franklin Gothic Medium';
-    font-size: 20px;
+    font-size: 15px;
     font-weight: bold;
 }
 .the-front{
@@ -272,8 +316,8 @@ input {
 
 .middle-part {
     width: 100%;
-    height: 68%;
-    font-size: 100px;
+    height: 70%;
+    font-size: 8vh;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -283,7 +327,7 @@ input {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
+    font-size: 15px;
     width: 100%;
     height: 15%;
 }

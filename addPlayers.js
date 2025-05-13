@@ -1,17 +1,17 @@
-import { gameState, cardObject, playerObject, getCards, getName, getMoney } from "../script.js";
+import { gameState, cardObject, playerObject, getCards, getName, getMoney, getUserID } from "../script.js";
 
 const positions = {
   1: { top: '85%', left: '50%' },
   2: { top: '85%', left: '30%' },
-  3: { top: '60%', left: '10%' },
-  3.5 : { top: '45%', left: '10%'},
+  3: { top: '70%', left: '10%' },
+  3.5 : { top: '50%', left: '10%'},
   4: { top: '35%', left: '10%' },
   5: { top: '15%', left: '30%' },
   6: { top: '15%', left: '50%' },
   7: { top: '15%', left: '70%' },
   8: { top: '35%', left: '90%' },
-  8.5: {top: '45%', left: '90%'},
-  9: { top: '60%', left: '90%' },
+  8.5: {top: '50%', left: '90%'},
+  9: { top: '70%', left: '90%' },
   10: { top: '85%', left: '70%' }
 };
 
@@ -29,33 +29,16 @@ function createPlayers(n) {
   let left;
   let right;
 
-  if(n>=3)
-  {
-    top = 3;
-    n-=3;
+  top = (n >= 3) ? 3 : n;
+  n = (n >= 3) ? n - 3 : 0;
 
-    if(n>=4)
-    {
-      left=2;
-      right=2;
+  left = (n>=2) ? 2 : n;
+  n = (n>=2) ? n - 2 : 0;
 
-      n-=4;
+  right = (n>=2) ? 2 : n;
+  n = (n>=2) ? n - 2 : 0;
 
-      if(n!=0)
-      {
-        bot=n;
-      }
-    }
-    else
-    {
-      left = Math.ceil(n/2);
-      right = n-left;
-    }
-  }
-  else
-  {
-    top = n;
-  }
+  bot = n;
 
   if(bot>=1)
   {
@@ -108,14 +91,14 @@ function createPlayers(n) {
 function addPlayer(ind, key) {
   const table = document.querySelector('.poker-table');
   const position = positions[key];
-
-  // Create main player container
+  
   const playerContainer = document.createElement('div');
   playerContainer.classList.add('table-player-container');
   playerContainer.style.position = 'absolute';
   playerContainer.style.top = position.top;
   playerContainer.style.left = position.left;
   playerContainer.style.transform = 'translate(-50%, -50%)';
+  playerContainer.id = `player-${getUserID(ind)}`;
 
   const cardContainer = document.createElement('div');
   cardContainer.classList.add('table-player-card-container');
@@ -125,50 +108,53 @@ function addPlayer(ind, key) {
   for (let i = 0; i < 2; i++) {
         const card = cards[i];
         // Clone the card element to avoid removing it from othersContainer
-        const clonedCard = card.element.cloneNode(true);
-        cardContainer.appendChild(clonedCard);
+        //const clonedCard = card.element.cloneNode(true);
+        cardContainer.appendChild(card.element);
     }
+
 
   playerContainer.appendChild(cardContainer);
 
-let moneyUser = document.createElement('div');
-moneyUser.classList.add('table-player-money');
-moneyUser.innerHTML =   `$${getMoney(ind)}`
-playerContainer.appendChild(moneyUser);
+  let infoUser = document.createElement('div');
+  infoUser.classList.add('table-player-info');
+
+  let moneyUser = document.createElement('div');
+  moneyUser.classList.add('table-player-money');
+  moneyUser.innerHTML =   `$${getMoney(ind)}`
+  moneyUser.id = `money-${getUserID(ind)}`;
+  infoUser.appendChild(moneyUser);
 
 
-let userP = document.createElement('div');
-userP.classList.add('table-player-username');
-userP.innerHTML = getName(ind);
-playerContainer.appendChild(userP);
+  let userP = document.createElement('div');
+  userP.classList.add('table-player-username');
+  userP.innerHTML = getName(ind);
+  userP.id = `name-${getUserID(ind)}`
+  infoUser.appendChild(userP);
 
-let title = document.createElement('div');
-title.classList.add('table-player-title')
-playerContainer.appendChild(title);
+  let title = document.createElement('div');
+  title.classList.add('table-player-title')
+  infoUser.appendChild(title);
 
-
-if(ind==0)
-{
-    title.innerHTML = "DEALER";
-}
-else if(ind==1)
-{
-    title.innerHTML = "small blind";
-}
-else if(ind==2)
-{
-    title.innerHTML = "big blind";
-}
+  playerContainer.appendChild(infoUser);
 
 
-const bubble = document.createElement('div');
-bubble.classList.add('bubble');
-bubble.textContent="action";
-bubble.id = `bubble-${getName(ind)}`;
-bubble.style.opacity = 0;
-playerContainer.appendChild(bubble); 
+  if(getUserID(ind)==0)
+  {
+      title.innerHTML = "DEALER";
+  }
 
-table.appendChild(playerContainer);
+  const bubble = document.createElement('div');
+  bubble.classList.add('bubble');
+  bubble.textContent="action";
+  bubble.id = `bubble-${getUserID(ind)}`;
+  bubble.style.opacity = 0;
+  bubble.classList.add('show');
+  playerContainer.appendChild(bubble); 
+
+  console.log(getUserID(ind) + "!!!!");
+
+
+  table.appendChild(playerContainer);
 }
 
 
