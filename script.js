@@ -48,7 +48,7 @@ class playerObject {
         this.Name = name ?? `Player#${gameState.players.length}`;
         this.BestHand = undefined;
         //Debt - still not realised but will be money that the player owes the "bank" and will payoff with every win 
-        //(scalable value from 25% to 50% of winning earnings)
+        //TODO: (scalable value from 25% to 50% of winning earnings)
         this.Debt = debt ?? 0;
         //HasFolded - flag used for filtering out players in a game that are still playing
         this.HasFolded = false;

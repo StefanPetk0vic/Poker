@@ -28,12 +28,12 @@ function StartGameLoop() {
     if (startBtn) startBtn.remove();
 
     RemoveJoinButton();
-    
+
     function rearrangePlayers(players, myName) {
         const myIndex = players.findIndex(p => p.Name === myName);
         if (myIndex === -1) return players;
         return [...players.slice(myIndex), ...players.slice(0, myIndex)];
-        }
+    }
 
     gameState.players = rearrangePlayers(gameState.players, "ME");
 
@@ -47,7 +47,7 @@ function StartGameLoop() {
             DelayMultiplier++;
         });
     }
-    
+
     GameLoop();
 
 }
@@ -89,7 +89,9 @@ async function GameLoop() {
     await new Promise(resolve => { setTimeout(resolve, 1500) });
     await PlaceBets();
     await CommunityDeal();
+    await PlaceBets();
 
+    //TODO: show all cards
     const winner = await CompareHands();
     await EndGame(winner, false);
     await ResetGame();
@@ -122,17 +124,15 @@ async function PlaceBets(FirstRound = false) {
     let maxBet = 0;
     //lastToRaiseIndex - we track the last person to raise
 
-    let lastToRaiseIndex = (FirstRound) ? -1 : ((currentIndex + activePlayers.length) % activePlayers.length);
+    let lastToRaiseIndex = -1;
 
     while (activePlayers.length > 1) {
         //currentPlayer - object from the arr that will be placed in the current betting
         const currentPlayer = activePlayers[currentIndex];
-
-        if (currentPlayer.HasFolded) {
-            currentIndex = (currentIndex + 1) % activePlayers.length;
-            console.log("%c The hasFolded check just to see if it ever prints", "color:red;font-size:32px");
-            continue;
-        }
+        console.log("EVOOO MEEE U WHILE");
+        console.log(activePlayers[currentIndex]);
+        console.log("----------------------");
+        console.log(" ");
 
         const { action, amount } = await getPlayerAction(currentPlayer, maxBet, FirstRound);
 
@@ -199,7 +199,7 @@ async function PlaceBets(FirstRound = false) {
                 break;
         }
 
-        
+
 
         //Checking again if there is still active players
         activePlayers = gameState.players.filter(p => !p.HasFolded);
@@ -211,7 +211,9 @@ async function PlaceBets(FirstRound = false) {
             currentIndex = currentIndex + 1;
         } else {
             if (currentIndex === 0) {
+                //Im changing firstToAct because im trying to keep it consistant with the left of dealer to play first
                 gameState.firstToAct = (gameState.firstToAct === 0) ? gameState.firstToAct : gameState.firstToAct - 1;
+                //TODO: a u kurac
             }
             if (currentIndex < lastToRaiseIndex) {
                 lastToRaiseIndex = (lastToRaiseIndex !== 0) ? lastToRaiseIndex - 1 : lastToRaiseIndex;
@@ -224,7 +226,9 @@ async function PlaceBets(FirstRound = false) {
         console.log(`%cLast to raise: ` + lastToRaiseIndex, `color: yellow; font-size: 12px;`);
         console.log("-------------------------------");
         console.log(" ");
-        if (currentIndex === lastToRaiseIndex) {
+        //TODO: add a check if everyone has played at least once.
+        
+        if ((currentIndex === lastToRaiseIndex) || ((currentIndex === 1) && (lastToRaiseIndex === -1))) {
             let allMatched = activePlayers.every(p => p.Bet === maxBet);
             if (allMatched) break;
         }
@@ -237,16 +241,16 @@ async function PlaceBets(FirstRound = false) {
 
 function getPlayerAction(player, maxBet, FirstRound) {
     return new Promise(resolve => {
-        const callActions = ['raise', 'call', 'fold','call','call','call'];
+        const callActions = ['raise', 'call', 'fold', 'call', 'call', 'call'];
         if (player.IsBot) {
             const action = callActions[Math.floor(Math.random() * callActions.length)];
-            
-        
+
+
             if (maxBet < 2 && FirstRound) {
                 let amount = maxBet + 1;
                 setTimeout(() => { resolve({ action: callActions[0], amount: amount }); }, RoundSpeed());
-                if (amount=='1') ShowAction('Small blind', player.UserID);
-                else if (amount=='2') ShowAction('Big blind', player.UserID);
+                if (amount == '1') ShowAction('Small blind', player.UserID);
+                else if (amount == '2') ShowAction('Big blind', player.UserID);
                 return;
             }
             if (action === 'call') {
@@ -254,12 +258,12 @@ function getPlayerAction(player, maxBet, FirstRound) {
                     console.warn(`Bot ${player.Name} | ${player.UserID} has tried to bet over his allowance. Auto-folding him`);
                     resolve({ action: callActions[2], amount: 0 });
                 }
-                
+
                 ShowAction('Call', player.UserID);
                 setTimeout(() => { resolve({ action: callActions[1], amount: maxBet }); }, RoundSpeed());
             }
             if (action === 'raise') {
-                
+
                 let maxTotalBet = Math.min(player.Money, maxBet + 50);
 
                 let amount = Math.floor(Math.pow(Math.random(), 2) * (maxTotalBet - maxBet)) + maxBet + 1;
@@ -268,7 +272,7 @@ function getPlayerAction(player, maxBet, FirstRound) {
 
                 let raiseAmount = amount - maxBet;
 
-                ShowAction('Raise', player.UserID,raiseAmount);               
+                ShowAction('Raise', player.UserID, raiseAmount);
 
                 setTimeout(() => {
                     resolve({ action: callActions[0], amount: amount });
@@ -282,7 +286,7 @@ function getPlayerAction(player, maxBet, FirstRound) {
                 ShowAction('Fold', player.UserID);
                 setTimeout(() => { resolve({ action: callActions[2], amount: 0 }); }, RoundSpeed());
                 return;
-                
+
             }
 
             return;
@@ -301,8 +305,7 @@ function getPlayerAction(player, maxBet, FirstRound) {
                 foldBtn.removeEventListener('click', onFold);
             }
 
-            function onCall()
-            {
+            function onCall() {
                 ShowAction("Call", player.UserID);
                 cleanUp();
                 HidePlayerButtons();
@@ -310,8 +313,7 @@ function getPlayerAction(player, maxBet, FirstRound) {
                 resolve({ action: 'call', amount: maxBet });
             }
 
-            function onRaise()
-            {
+            function onRaise() {
 
                 cleanUp()
                 let amount;
@@ -326,13 +328,12 @@ function getPlayerAction(player, maxBet, FirstRound) {
                 }
                 HidePlayerButtons();
                 console.log("You have raised to " + amount);
-                resolve({action: 'raise', amount: amount});
+                resolve({ action: 'raise', amount: amount });
 
                 ShowAction("Raise", player.UserID, amount);
             }
 
-            function onFold()
-            {
+            function onFold() {
                 ShowAction("Fold", player.UserID);
                 showFold(player.userID);
                 cleanUp();
@@ -350,46 +351,41 @@ function getPlayerAction(player, maxBet, FirstRound) {
     })
 }
 
-function ShowAction(action, userID, amount)
-{
-    let bubbleId=`bubble-${userID}`;
-        let bubbleElement = document.getElementById(bubbleId);
+function ShowAction(action, userID, amount) {
+    let bubbleId = `bubble-${userID}`;
+    let bubbleElement = document.getElementById(bubbleId);
 
-        if(action=='Raise')
-        {
-            bubbleElement.textContent = action + " $" + amount;  
-        }
-        else
-        {
-            bubbleElement.textContent = action; 
-        }
-        
-        bubbleElement.style.opacity=100;
+    if (action == 'Raise') {
+        bubbleElement.textContent = action + " $" + amount;
+    }
+    else {
+        bubbleElement.textContent = action;
+    }
 
-    
-        setTimeout(function () {
-                bubbleElement.style.opacity = '0';
-            }, 1000);
-    
+    bubbleElement.style.opacity = 100;
+
+
+    setTimeout(function () {
+        bubbleElement.style.opacity = '0';
+    }, 1000);
+
 }
 
-function showFold(userID)
-{
+function showFold(userID) {
     let id = `player-${userID}`;
     let playerContainer = document.getElementById(id);
     playerContainer.classList.add('folded');
     const carddContainer = playerContainer.querySelector('.table-player-card-container');
     if (carddContainer) {
         carddContainer.style.opacity = '0.3';
-    }   
+    }
 
 }
 
-function UpdateMoney(userID, Money)
-{
+function UpdateMoney(userID, Money) {
     let id = `money-${userID}`;
     let moneyElement = document.getElementById(id);
-    moneyElement.textContent= "$" + Money;
+    moneyElement.textContent = "$" + Money;
 }
 
 
@@ -463,7 +459,7 @@ async function tieBreaker(best, current) {
         if (rankOrder[best.BestHand.hand[index].Name] > rankOrder[current.BestHand.hand[index].Name]) {
             return best;
         }
-        else if(rankOrder[best.BestHand.hand[index].Name] < rankOrder[current.BestHand.hand[index].Name]){
+        else if (rankOrder[best.BestHand.hand[index].Name] < rankOrder[current.BestHand.hand[index].Name]) {
             return current;
         }
     }
@@ -514,15 +510,15 @@ async function evaluateHand(hands, playerName) {
     //#      Hierarchy of hands         #
     //# The best hand: Top->Bottom      #
     //###################################
-    //# 1.Straight flush || royal flush #
-    //#        2.Four of a kind         #
-    //#        3.Full house             #
-    //#        4.flush                  #
-    //#        5.straight               #
-    //#        6.three of a kind        #
-    //#        7.two pair               #
-    //#        8.pair                   #
-    //#        9.high card              #
+    //# 1.Straight flush || royal flush # RAISE
+    //#        2.Four of a kind         # RAISE
+    //#        3.Full house             # RAISE
+    //#        4.flush                  # RAISE/CALL
+    //#        5.straight               # RAISE/CALL
+    //#        6.three of a kind        # RAISE/CALL
+    //#        7.two pair               # CALL
+    //#        8.pair                   # CALL/FOLD
+    //#        9.high card              # CALL/FOLD/FOLD
     //###################################
 
     // HistInfo = { rankCounts, countsSorted, byCountThenRank }
@@ -793,15 +789,15 @@ async function EndGame(winnerPtr, Flag) {
     }
     //TODO: fix the missing money (If adding "winner.Debt" didn't fix it)
     //Msm da moramo da vratimo pare vidim da pobedniku fale tkd nisam duboko se zagledao u ovaj bug
-    winner.Money += gameState.betSum+winner.Debt;
+    winner.Money += gameState.betSum + winner.Debt;
     console.log("-------END GAME---------");
     console.log("The winner is: " + winner.Name);
     console.log("total winnings: " + gameState.betSum);
     console.log("------------------------");
     console.log(winner);
     console.log("---------Debug----------");
-    console.log("Debug Bet Sum = "+gameState.betSum);
-    console.log("Debug Debt = "+winner.Debt);
+    console.log("Debug Bet Sum = " + gameState.betSum);
+    console.log("Debug Debt = " + winner.Debt);
     console.log(gameState.players.filter(p => !p.HasFolded));
 }
 
