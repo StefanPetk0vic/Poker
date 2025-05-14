@@ -15,75 +15,94 @@ const positions = {
   10: { top: '85%', left: '70%' }
 };
 
-function createPlayers(n) {
+function createPlayers() {
   const table = document.querySelector('.poker-table');
 
-  let ind = 0;
+  let numOfPlayers = gameState.players.length;
+  let index = gameState.players.findIndex(p => p.Name === "ME");
+  index = (index === -1) ? 0 : index;
+  let lineupIndexes = [];
+  
+  if (index !== 0) {
+    for (let i = index; i < numOfPlayers; i++) {
+        lineupIndexes.push(i);
+    }
+    for (let i = 0; i < index; i++) {
+        lineupIndexes.push(i);
+    }
+  }
+  else {
+    for (let i = 0; i < gameState.players.length; i++) {
+        lineupIndexes.push(i);
+    } 
+  }
 
-  addPlayer(ind++, 1);
+  let j = 0;
+
+  addPlayer(lineupIndexes[j++], 1);
     
-  n-=1;
+  numOfPlayers-=1;
   
   let top;
   let bot;
   let left;
   let right;
 
-  top = (n >= 3) ? 3 : n;
-  n = (n >= 3) ? n - 3 : 0;
+  top = (numOfPlayers >= 3) ? 3 : numOfPlayers;
+  numOfPlayers = (numOfPlayers >= 3) ? numOfPlayers - 3 : 0;
 
-  left = (n>=2) ? 2 : n;
-  n = (n>=2) ? n - 2 : 0;
+  left = (numOfPlayers>=2) ? 2 : numOfPlayers;
+  numOfPlayers = (numOfPlayers>=2) ? numOfPlayers - 2 : 0;
 
-  right = (n>=2) ? 2 : n;
-  n = (n>=2) ? n - 2 : 0;
+  right = (numOfPlayers>=2) ? 2 : numOfPlayers;
+  numOfPlayers = (numOfPlayers>=2) ? numOfPlayers - 2 : 0;
 
-  bot = n;
+  bot = numOfPlayers;
 
   if(bot>=1)
   {
-    addPlayer(ind++, 2);
+    addPlayer(lineupIndexes[j++], 2);
   }
 
   if(left==1)
   {
-    addPlayer(ind++, 3.5);
+    addPlayer(lineupIndexes[j++], 3.5);
   }
   else if(left==2)
   {
-    addPlayer(ind++, 3);
-    addPlayer(ind++, 4);
+    addPlayer(lineupIndexes[j++], 3);
+    addPlayer(lineupIndexes[j++], 4);
   }
 
   if(top==1)
   {
-    addPlayer(ind, 6); 
+    addPlayer(lineupIndexes[j++], 6); 
   }
   else if(top==2)
   {
-    addPlayer(ind++, 5);
-    addPlayer(ind++, 7);
+    addPlayer(lineupIndexes[j++], 5);
+    addPlayer(lineupIndexes[j++], 7);
   }
   else if(top==3)
   {
-    addPlayer(ind++, 5);
-    addPlayer(ind++, 6);
-    addPlayer(ind++, 7);
+    addPlayer(lineupIndexes[j++], 5);
+    addPlayer(lineupIndexes[j++], 6);
+    addPlayer(lineupIndexes[j++], 7);
   }
 
   if(right==1)
   {
-    addPlayer(ind++, 8.5);
+    addPlayer(lineupIndexes[j++], 8.5);
   }
   else if(right==2)
   {
-    addPlayer(ind++, 8);
-    addPlayer(ind++, 9);
+    addPlayer(lineupIndexes[j++], 8);
+    addPlayer(lineupIndexes[j++], 9);
   }
 
   if(bot==2)
   {
-    addPlayer(ind++, 10);
+    addPlayer(lineupIndexes[j++],10);
   }
 
 }
@@ -151,8 +170,7 @@ function addPlayer(ind, key) {
   bubble.classList.add('show');
   playerContainer.appendChild(bubble); 
 
-  console.log(getUserID(ind) + "!!!!");
-
+  console.log(playerContainer.id +"ids");
 
   table.appendChild(playerContainer);
 }

@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="/Styles/style.css">
     <link rel="stylesheet" href="/Styles/popup.css">
     <link rel="stylesheet" href="/Styles/actionbubble.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <script type="module" src="script.js"></script>
     <script type="module" src="./functions/popupController.js"></script>
     </link>
@@ -28,27 +31,28 @@
                 
                 <button  class="game-btn" value="2" id="add-bot" onclick="AddBot(value,this.id)">Add bot</button>
             </div>
-            <main class="game-container">
+            <div class="game-container">
                 <div class="poker-table">
 
                     <p class="timer">clock:</p>
-                    <p class="money-pot"> bet:</p>
+                    <p class="money-pot" id="money-pot"></p>
 
                     <div class="community-card-container" id="community-container-id"></div>
                     <div class="player-card-container" id="player-container-id">
-                        <button class="game-btn" id="player-join"value="2" onclick="PlayerJoin(value,this.id)">Join</button>
+                        <button class="join-btn" id="player-join"value="2" onclick="PlayerJoin(value,this.id)">JOIN</button>
                     </div>
                     </div>
                 </div>
-                <div class="btn-container" id="player-btn-container-id"></div>
-            </main>
-            <aside class="players-container">
-                <p style="margin-bottom: 15px;" 15px;>Info:</p>
-                <p style="text-align: left; margin: 0 0 15px 5px;">Name:</p>
-                <p style="text-align: left; margin: 0 0 15px 5px;">Money:</p>
-                <p style="text-align: left; margin: 0 0 15px 5px;">Debt:</p>
-            </aside>
+                <div class="players-container">
+                    <p style="margin-bottom: 15px;" 15px;>Info:</p>
+                    <p style="text-align: left; margin: 0 0 15px 5px;">Name:</p>
+                    <p style="text-align: left; margin: 0 0 15px 5px;">Money:</p>
+                    <p style="text-align: left; margin: 0 0 15px 5px;">Debt:</p>
+                </div>
+            </div>
+            
         </div>
+        <div class="btn-container" id="player-btn-container-id"></div>
 
     </div>
     <div class="popup-container" id="starting-container-id">

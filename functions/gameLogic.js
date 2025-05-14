@@ -29,20 +29,12 @@ function StartGameLoop() {
 
     RemoveJoinButton();
 
-    function rearrangePlayers(players, myName) {
-        const myIndex = players.findIndex(p => p.Name === myName);
-        if (myIndex === -1) return players;
-        return [...players.slice(myIndex), ...players.slice(0, myIndex)];
-    }
-
-    gameState.players = rearrangePlayers(gameState.players, "ME");
-
-    createPlayers(gameState.players.length);
+    createPlayers();
 
     gameState.isGameRunning = true;
     let DelayMultiplier = 1;
     if (gameState.playersPos != undefined) {
-        gameState.players[0].Cards.forEach(card => {
+        gameState.players[gameState.playersPos].Cards.forEach(card => {
             setTimeout(() => { card.FlipCard() }, DelayMultiplier * 250);
             DelayMultiplier++;
         });
@@ -94,6 +86,9 @@ async function GameLoop() {
     //TODO: show all cards
     const winner = await CompareHands();
     await EndGame(winner, false);
+
+    await ShowCards();
+
     await ResetGame();
 }
 async function BreakGame() {
@@ -126,6 +121,10 @@ async function PlaceBets(FirstRound = false) {
 
     let lastToRaiseIndex = -1;
 
+    activePlayers.forEach(player => {
+    player.hasPlayedBefore = false;
+    });
+
     while (activePlayers.length > 1) {
         //currentPlayer - object from the arr that will be placed in the current betting
         const currentPlayer = activePlayers[currentIndex];
@@ -135,6 +134,8 @@ async function PlaceBets(FirstRound = false) {
         console.log(" ");
 
         const { action, amount } = await getPlayerAction(currentPlayer, maxBet, FirstRound);
+
+        currentPlayer.hasPlayedBefore = true;
 
         switch (action) {
             case 'fold':
@@ -154,8 +155,9 @@ async function PlaceBets(FirstRound = false) {
                     currentPlayer.Money -= (amount - currentPlayer.Bet);
 
                     UpdateMoney(currentPlayer.UserID, currentPlayer.Money);
-
+   
                     currentPlayer.Bet += (amount - currentPlayer.Bet);
+                    
                     console.log("-----------------------------------");
                     console.log(
                         `%cThe bot has called: ${currentPlayer.Name} | ${currentPlayer.UserID}`,
@@ -177,9 +179,13 @@ async function PlaceBets(FirstRound = false) {
                     currentPlayer.Money -= amount;
 
                     UpdateMoney(currentPlayer.UserID, currentPlayer.Money);
-
+                    
                     currentPlayer.Bet += amount;
+
                     maxBet = currentPlayer.Bet;
+
+                    UpdateMoneyPot(maxBet);
+
                     lastToRaiseIndex = currentIndex;
                     console.log("-----------------------------------");
                     console.log(
@@ -228,11 +234,19 @@ async function PlaceBets(FirstRound = false) {
         console.log(" ");
         //TODO: add a check if everyone has played at least once.
         
-        if ((currentIndex === lastToRaiseIndex) || ((currentIndex === 1) && (lastToRaiseIndex === -1))) {
+        if ((currentIndex === lastToRaiseIndex)) {
             let allMatched = activePlayers.every(p => p.Bet === maxBet);
             if (allMatched) break;
         }
+
+           const everyonePlayedOnce = activePlayers.every(p => p.hasPlayedBefore);
+           const allMatched = activePlayers.every(p => p.Bet === maxBet);
+           if (everyonePlayedOnce && allMatched) 
+            break;
+
     }
+ 
+
     gameState.players.forEach(player => {
         gameState.betSum += player.Bet;
         player.Bet = 0;
@@ -245,7 +259,7 @@ function getPlayerAction(player, maxBet, FirstRound) {
         if (player.IsBot) {
             const action = callActions[Math.floor(Math.random() * callActions.length)];
 
-
+            //ShowTurn(player.UserID);
             if (maxBet < 2 && FirstRound) {
                 let amount = maxBet + 1;
                 setTimeout(() => { resolve({ action: callActions[0], amount: amount }); }, RoundSpeed());
@@ -291,6 +305,13 @@ function getPlayerAction(player, maxBet, FirstRound) {
 
             return;
         }
+        else if (maxBet < 2 && FirstRound) {
+                let amount = maxBet + 1;
+                setTimeout(() => { resolve({ action: callActions[0], amount: amount }); }, RoundSpeed());
+                if (amount == '1') ShowAction('Small blind', player.UserID);
+                else if (amount == '2') ShowAction('Big blind', player.UserID);
+                return;
+            }
         else {
 
             ShowPlayerButtons();
@@ -310,36 +331,49 @@ function getPlayerAction(player, maxBet, FirstRound) {
                 cleanUp();
                 HidePlayerButtons();
                 console.log("You have called.");
-                resolve({ action: 'call', amount: maxBet });
+                setTimeout(() => {
+                    resolve({ action: 'call', amount: maxBet });
+                }, 2000); 
+                
             }
 
             function onRaise() {
 
-                cleanUp()
+             
                 let amount;
 
                 while (true) {
                     amount = prompt("Enter your raise amount:");
+                    if (amount === null) {
+                        console.log("Raise cancelled.");
+                        return;
+                    }
                     amount = parseInt(amount);
 
                     if (isNaN(amount)) alert("Invalid raise amount. Not a number.");
                     else if (amount <= maxBet) alert("Invalid raise amount. Not a number.");
                     else break;
                 }
+                cleanUp()
                 HidePlayerButtons();
                 console.log("You have raised to " + amount);
-                resolve({ action: 'raise', amount: amount });
+                setTimeout(() => {
+                    resolve({ action: 'raise', amount: amount });
+                }, 2000); 
+                return;
 
                 ShowAction("Raise", player.UserID, amount);
             }
 
             function onFold() {
                 ShowAction("Fold", player.UserID);
-                showFold(player.userID);
+                showFold(player.UserID);
                 cleanUp();
                 HidePlayerButtons();
                 console.log("You have folded");
-                resolve({ action: 'fold', amount: 0 });
+                setTimeout(() => {
+                    resolve({ action: 'fold', amount: 0 });
+                }, 2000); 
             }
 
             callBtn.addEventListener('click', onCall);
@@ -373,6 +407,7 @@ function ShowAction(action, userID, amount) {
 
 function showFold(userID) {
     let id = `player-${userID}`;
+    console.log(id + "  FOLDING");
     let playerContainer = document.getElementById(id);
     playerContainer.classList.add('folded');
     const carddContainer = playerContainer.querySelector('.table-player-card-container');
@@ -382,10 +417,27 @@ function showFold(userID) {
 
 }
 
+function ShowTurn(userID)
+{
+    const id = `player-${userID}`;
+    const tableContainer = document.getElementById(id);
+
+    if (tableContainer) {
+        tableContainer.classList.add("turn-glow");
+    }
+}
+
 function UpdateMoney(userID, Money) {
     let id = `money-${userID}`;
     let moneyElement = document.getElementById(id);
     moneyElement.textContent = "$" + Money;
+}
+
+function UpdateMoneyPot(bet)
+{
+    let id = `money-pot`;
+    let moneyPot = document.getElementById(id);
+    moneyPot.textContent = "BET: $" + bet;
 }
 
 
@@ -417,6 +469,8 @@ function RoundSpeed(Active = true) {
         //u tome je i stvar dumbass da "razmisle" botovi.
         //Ako zelis quick round onda stavi na false da ga ubrzas
         // _FALSE i _TRUE da ga lakse nadjes i menjas
+
+        //jbt kad igras sah protiv racunara jel mu treba vreme da razmisli ili samo igra smhhhhhhh
     }
     return 0;
 }

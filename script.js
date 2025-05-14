@@ -58,6 +58,8 @@ class playerObject {
         //(used for the betting logic)
         this.IsBot = null;
         this.DebugColor = GenerateColor();
+
+        this.hasPlayedBefore = false;
     }
 }
 function GenerateColor() {
@@ -222,9 +224,20 @@ function PlayerJoin(drawNum = 0, location) {
             cards.push(cardObj);
             //othersContainer.appendChild(cards[i].element);
         }
+        
+        let Container = document.querySelector(".others-container");
+        let othersContainer = document.createElement('div');
+        othersContainer.id = 'other-container-id';
+
+        let userP = document.createElement('p');
+        userP.style.fontSize = "24px";
+        userP.innerHTML = "ME";
+        userP.style.fontWeight = "700";
+        othersContainer.appendChild(userP);
+        Container.appendChild(othersContainer);
 
         //Player info won't be undefined once we add UUID and socket.io
-        let playerObj = new playerObject(cards, undefined, undefined, "ME", undefined);
+        let playerObj = new playerObject(cards, undefined, gameState.players.length, "ME", undefined);
         playerObj.IsBot = false;
         gameState.players.push(playerObj);
         gameState.playersPos = playerObj.UserID;
@@ -315,7 +328,6 @@ async function CommunityDeal(drawNum = 1) {
     await Promise.all(flipPromises);
 }
 
-
 function AddBot(drawNum = 0, location) {
     let playerCount = document.querySelector(".player-count");
     
@@ -355,7 +367,7 @@ function RemoveBotName(name) {
 
 function CreateOthers(name) {
     let cards = [];
-    let cardContainer = document.querySelector(".others-container");
+    let Container = document.querySelector(".others-container");
     let othersContainer = document.createElement('div');
     //othersContainer.classList.add("others-card-container");
     othersContainer.id = 'other-container-id';
@@ -370,7 +382,7 @@ function CreateOthers(name) {
         cards.push(cardObj);
         //othersContainer.appendChild(cards[i].element);
     }
-    cardContainer.appendChild(othersContainer);
+    Container.appendChild(othersContainer);
     return cards;
 }
 

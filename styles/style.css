@@ -7,6 +7,7 @@ body {
     font-family: Roboto;
     font-size: 30px;
     background: linear-gradient(to bottom, #371a46 0%, #000000 100%);
+    overflow: hidden;
 
 }
 
@@ -35,7 +36,7 @@ input {
 }
 
 .players-container {
-    width: 180px;
+    width: 190px;
     height: 30vh;
     background-color: orange;
     border: 2px solid black;
@@ -68,7 +69,10 @@ input {
     letter-spacing: 2px;         /* Add breathing room between letters */
     text-shadow: 2px 2px 5px #000; /* Add depth with shadow */
     color: #ffffff;              /* Use a gold color for luxurious contrast */
-    margin: 0 auto;              /* Center it visually if space allows */
+    text-align: center;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);         
 }
 
 .game-container {
@@ -100,10 +104,13 @@ input {
 
 
 .money-pot {
-    padding-right: 10px;
     position: absolute;
-    top: 0;
-    right: 0;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: 600;
 }
 
 .timer {
@@ -146,7 +153,10 @@ input {
     justify-content: center;
     gap: 0px;
     
+}
 
+.turn-glow {
+    background: radial-gradient(circle, rgba(255, 215, 0, 0.4) 0%, rgba(255, 215, 0, 0) 70%);
 }
 
 .table-player-info {
@@ -156,16 +166,6 @@ input {
     align-items: center;
     justify-content: center;
     gap: 0px;
-}
-
-.turn-indicator {
-    position: absolute;
-    width: 150px;
-    height: 20px;
-    border-radius: 50%;
-    border: 3px solid rgba(0, 255, 0, 0.7);
-    box-shadow: 0 0 15px rgba(0, 255, 0, 0.7);
-    z-index: 0;
 }
 
 .table-player-container.folded::after {
@@ -298,14 +298,20 @@ input {
     font-weight: bold;
 }
 .the-front{
-    border: 2.5px solid black;
+    border: 0.5px solid black;
 }
 .the-back {
-    background: url('textures/backcard.png') no-repeat center center;
+    background: linear-gradient(
+        135deg,                    /* Diagonal angle */
+        rgb(206, 35, 35) 0%,       /* Base red color */
+        rgb(206, 35, 35) 45%,      /* Keep base color up to near diagonal */
+        rgb(145, 36, 36) 55%, /* Light diagonal edge */
+        rgb(97, 17, 17)100%      /* Lighter red below the line */
+    );
+    border: 3.5px solid white;
     background-size: contain;
     transform: rotateY(0deg);
     box-sizing: border-box;
-    border: unset;
 
 }
 
@@ -337,20 +343,55 @@ input {
     gap: 10px;
     align-items: center;
     justify-content: center;
-    margin: 20px auto;
     font-size: 16px;
-    width: 1100px;
     height: 10vh;
-    background-color: purple;
     border-radius: 15px;
+
 }
 
 .game-btn {
     margin: 0 5px 0 5px;
-    background-color: white;
-    width: 60px;
-    height: 60px;
-    border-radius: 25%;
+    background: linear-gradient(to bottom, rgb(255, 179, 36) 0%, rgb(255, 140, 36) 100%);
+    color: rgb(0, 0, 0);
+    font-family: 'Roboto';
+    font-weight: 700;
+    font-size: 20px;
+    width: 100px;
+    height: 50px;
+    border-radius: 5%;
+    border:none;
+    transition: all 0.3 ease;
+    border: 1px solid black;
+    
+}
+
+.game-btn:hover {
+    transform: scale(1.05);
+    transform: translateY(-2px);
+    background: linear-gradient(to bottom, rgb(255, 189, 66) 0%, rgb(255, 152, 62) 100%);
+    cursor: pointer;
+}
+
+.join-btn {
+    margin: 0 5px 0 5px;
+    background: linear-gradient(to bottom, rgb(59, 237, 50) 0%, rgb(32, 147, 57) 100%);
+    color: rgb(0, 0, 0);
+    font-family: 'Roboto';
+    font-weight: 700;
+    font-size: 20px;
+    width: 100px;
+    height: 50px;
+    border-radius: 5%;
+    border:none;
+    transition: all 0.3 ease;
+    top:170%;
+    position: relative;
+}
+
+.join-btn:hover {
+    transform: scale(1.05);
+    background: linear-gradient(to bottom, rgb(86, 255, 77) 0%, rgb(39, 163, 66) 100%);
+    cursor: pointer;
 }
 
 .slider-container {
