@@ -17,7 +17,7 @@ const positions = {
 
 function createPlayers() {
   const table = document.querySelector('.poker-table');
-
+  
   let numOfPlayers = gameState.players.length;
   let index = gameState.players.findIndex(p => p.Name === "ME");
   index = (index === -1) ? 0 : index;
@@ -173,6 +173,7 @@ function addPlayer(ind, key) {
   console.log(playerContainer.id +"ids");
 
   table.appendChild(playerContainer);
+
 }
 
 

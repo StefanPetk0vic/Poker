@@ -222,9 +222,16 @@ input {
     align-items: center;
     justify-content: center;
     gap: 10px;
-    width: 120px;
+    width: 100%;
     height: 80px; 
     border-radius: 0px 0px 10px 10px;
+}
+
+.table-player-card-container>.cards
+{
+    width: 55px;
+    height: 80px;
+
 }
 
 .others-card-container {
@@ -278,6 +285,7 @@ input {
     transition: transform 0.6s ease;
     position: relative;
     transform: rotateY(0deg);
+
 }
 
 
@@ -294,7 +302,7 @@ input {
     color: #333;
     text-align: center;
     font-family: 'Franklin Gothic Medium';
-    font-size: 15px;
+    font-size: 105px;
     font-weight: bold;
 }
 .the-front{
@@ -309,15 +317,15 @@ input {
         rgb(97, 17, 17)100%      /* Lighter red below the line */
     );
     border: 3.5px solid white;
-    background-size: contain;
-    transform: rotateY(0deg);
     box-sizing: border-box;
+    transform: rotateY(0deg);
 
 }
 
 .the-front{
     background: #ffffff;
     transform: rotateY(180deg);
+    width: 100%;
 }
 
 .middle-part {
@@ -327,6 +335,7 @@ input {
     display: flex;
     align-items: center;
     justify-content: center;
+
 }
 
 .updown-part {
@@ -336,8 +345,18 @@ input {
     font-size: 15px;
     width: 100%;
     height: 15%;
+
 }
 
+
+.cards.win {
+    border: 3px solid gold !important;
+    border-radius: 10%;
+    box-shadow: 0 0 15px gold !important;
+    margin: 0 5px;
+    transform: rotateY(180deg) scale(1.1) !important;
+
+}
 .btn-container {
     display: flex;
     gap: 10px;
@@ -407,4 +426,13 @@ input {
     border-radius: 25%;
 }
 
-
+.dim-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.43); /* #0000006d is equivalent to 0.43 alpha */
+    pointer-events: none;   /* so clicks go through, optional */
+    z-index: 0;   
+}

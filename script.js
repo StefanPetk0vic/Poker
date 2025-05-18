@@ -160,20 +160,24 @@ function onPlayerLeave() {
 }
 //#endregion
 
-function ShowCards() {
+async function ShowCards() {
+    const flipPromises = [];
+
     gameState.players.forEach(player => {
         player.Cards.forEach(card => {
             if (!card.Flipped) {
-                card.FlipCard();
-
+                flipPromises.push(card.FlipCard());
             }
-        })
-    })
+        });
+    });
+
     gameState.communityCards.forEach(card => {
         if (!card.Flipped) {
-            card.FlipCard();
+            flipPromises.push(card.FlipCard());
         }
-    })
+    });
+
+    await Promise.all(flipPromises);
 }
 
 function GenerateDeck() {

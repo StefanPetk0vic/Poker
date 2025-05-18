@@ -31,13 +31,14 @@
                 
                 <button  class="game-btn" value="2" id="add-bot" onclick="AddBot(value,this.id)">Add bot</button>
             </div>
-            <div class="game-container">
+            <div class="game-container" id ="game-container-id">
                 <div class="poker-table">
 
                     <p class="timer">clock:</p>
                     <p class="money-pot" id="money-pot"></p>
 
                     <div class="community-card-container" id="community-container-id"></div>
+                    <p class="winner" id="win"></p>
                     <div class="player-card-container" id="player-container-id">
                         <button class="join-btn" id="player-join"value="2" onclick="PlayerJoin(value,this.id)">JOIN</button>
                     </div>

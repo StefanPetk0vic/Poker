@@ -89,6 +89,11 @@ async function GameLoop() {
 
     await ShowCards();
 
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    //so it doesn't show all cards and hightlight at the same sec
+
+    HighlightWinningCards(winner.BestHand.contributingCards);
+
     await ResetGame();
 }
 async function BreakGame() {
@@ -484,6 +489,9 @@ async function CompareHands() {
     let activePlayers = gameState.players.filter(p => !p.HasFolded);
     await GenerateBestHand(activePlayers);
     const winner = getWinner(activePlayers);
+    //console.log("Winner inside CompareHands:", winner);
+    //console.log("Winner.BestHand:", winner.BestHand);
+    //HighlightWinningCards(winner.BestHand.contributingCards);
     return winner;
 
 }
@@ -587,8 +595,14 @@ async function evaluateHand(hands, playerName) {
             const straightFlush = {
                 type: (straightInfo[index].highCard === "A") ? 'Royal Flush' : 'Straight Flush',
                 rank: straightInfo[index].highCard,
-                hand: hands[index]
+                hand: hands[index],
+                contributingCards: null
             };
+            if(straightFlush.type==='Royal Flush')
+                straightFlush.contributingCards=GetContributingCards(hands[index], 'Royal Flush', histoInfo[index])
+            else
+                straightFlush.contributingCards=GetContributingCards(hands[index], 'Straight Flush', histoInfo[index])
+
             if (!BestHand || rankOrder[straightFlush.rank] > rankOrder[BestHand.rank]) {
                 BestHand = straightFlush;
             }
@@ -602,7 +616,8 @@ async function evaluateHand(hands, playerName) {
             const fourOfAKind = {
                 type: 'Four Of A Kind',
                 rank: histo.byCountThenRank[0][0],
-                hand: hands[index]
+                hand: hands[index],
+                contributingCards: GetContributingCards(hands[index], 'Four Of A Kind', histoInfo[index])
             }
             if (!BestHand || rankOrder[fourOfAKind.rank] > rankOrder[BestHand.rank]) {
                 BestHand = fourOfAKind;
@@ -617,7 +632,8 @@ async function evaluateHand(hands, playerName) {
             const fullHouse = {
                 type: 'Full House',
                 rank: histo.byCountThenRank[0][0],
-                hand: hands[index]
+                hand: hands[index],
+                contributingCards: GetContributingCards(hands[index], 'Full House', histoInfo[index])
             }
             if (!BestHand || rankOrder[fullHouse.rank] > rankOrder[BestHand.rank]) {
                 BestHand = fullHouse;
@@ -632,7 +648,8 @@ async function evaluateHand(hands, playerName) {
             const flushBH = {
                 type: 'Flush',
                 rank: flush.sortRanked[0],
-                hand: hands[index]
+                hand: hands[index],
+                contributingCards: GetContributingCards(hands[index], 'Flush', histoInfo[index])
             };
             if (!BestHand || rankOrder[flushBH.rank] > rankOrder[BestHand.rank]) {
                 BestHand = flushBH;
@@ -647,7 +664,8 @@ async function evaluateHand(hands, playerName) {
             const straightBH = {
                 type: 'Straight',
                 rank: straight.highCard,
-                hand: hands[index]
+                hand: hands[index],
+                contributingCards: GetContributingCards(hands[index], 'Straight', histoInfo[index])
             }
             if (!BestHand || rankOrder[straightBH.rank] > rankOrder[BestHand.rank]) {
                 BestHand = straightBH;
@@ -662,7 +680,8 @@ async function evaluateHand(hands, playerName) {
             const threeOfAKind = {
                 type: 'Three Of A Kind',
                 rank: histo.byCountThenRank[0][0],
-                hand: hands[index]
+                hand: hands[index],
+                contributingCards: GetContributingCards(hands[index], 'Three Of A Kind', histoInfo[index])
             }
             if (!BestHand || rankOrder[threeOfAKind.rank] > rankOrder[BestHand.rank]) {
                 BestHand = threeOfAKind;
@@ -677,7 +696,8 @@ async function evaluateHand(hands, playerName) {
             const twoPair = {
                 type: 'Two Pair',
                 rank: histo.byCountThenRank[0][0],
-                hand: hands[index]
+                hand: hands[index],
+                contributingCards: GetContributingCards(hands[index], 'Two Pair', histoInfo[index])
             }
             if (!BestHand || rankOrder[twoPair.rank] > rankOrder[BestHand.rank]) {
                 BestHand = twoPair;
@@ -692,7 +712,8 @@ async function evaluateHand(hands, playerName) {
             const pair = {
                 type: 'Pair',
                 rank: histo.byCountThenRank[0][0],
-                hand: hands[index]
+                hand: hands[index],
+                contributingCards: GetContributingCards(hands[index], 'Pair', histoInfo[index])
             }
             if (!BestHand || rankOrder[pair.rank] > rankOrder[BestHand.rank]) {
                 BestHand = pair;
@@ -707,7 +728,8 @@ async function evaluateHand(hands, playerName) {
             const highCard = {
                 type: 'High Card',
                 rank: histo.byCountThenRank[0][0],
-                hand: hands[index]
+                hand: hands[index],
+                contributingCards: GetContributingCards(hands[index], 'High Card', histoInfo[index])
             }
             if (!BestHand || rankOrder[highCard.rank] > rankOrder[BestHand.rank]) {
                 BestHand = highCard;
@@ -863,5 +885,52 @@ async function EndGame(winnerPtr, Flag) {
 //za bota- kad bot treba da bira, ovde treba neki AI idk
 
 
+function GetContributingCards(hand, type, histo)
+{
+    switch(type) {
+        case 'Royal Flush':
+        case 'Straight Flush':
+        case 'Flush':
+        case 'Straight':
+            return [...hand]; //vrati sve pet karte
+
+        case 'Four Of A Kind':
+            const quadRank = histo.byCountThenRank[0][0];
+            return hand.filter(c => c.Name == quadRank); //filtriraj samo 4 karte sa istim rankom
+        
+        case 'Full House':
+            return [...hand]; //vrati sve 5 jer je 3ranka + 2ranka
+
+        case 'Three Of A Kind':
+            const tripsRank = histo.byCountThenRank[0][0];
+            return hand.filter(c=> c.Name == tripsRank); // kao four of a kind
+        
+        case 'Two Pair':
+            const firstPairRank = histo.byCountThenRank[0][0];
+            const secondPairRank = histo.byCountThenRank[1][0];
+            return hand.filter(c=> c.Name == firstPairRank || c.Name == secondPairRank);
+
+        case 'Pair':
+            const pairRank = histo.byCountThenRank[0][0];
+            return hand.filter(c=> c.Name == pairRank);
+            
+        case 'High Card':
+            return [hand.sort((a,b)=>rankOrder[b.Name]-rankOrder[a.Name])[0]];
+            
+        default:
+            return [];    
+    }
+}
+
+function HighlightWinningCards(contributingCards)
+{ 
+   
+    contributingCards.forEach(card => {
+        if (card.element) {  // Safety check
+            card.element.classList.add('win');
+
+        }
+    });
+}
 
 export { GameLoop, MonitorPlayers, }
