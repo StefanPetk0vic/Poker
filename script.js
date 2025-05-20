@@ -31,7 +31,8 @@ let gameState = {
     //firstToAct -set to 1 because the player[0] is the dealer. This is the Small Blind (SB) player the value can change
     firstToAct: 1,
     Dealer: 0,
-    NumOfFolds: 0
+    NumOfFolds: 0,
+    firstGame: true
 };
 //#endregion
 
@@ -79,7 +80,6 @@ class cardObject {
         const cardDiv = document.createElement('div');
         cardDiv.classList.add("cards");
         
-
         const theBack = document.createElement('div');
         theBack.classList.add('the-back');
 
@@ -88,6 +88,7 @@ class cardObject {
 
         cardDiv.appendChild(theBack);
         cardDiv.appendChild(theFront);
+        
         for (let index = 0; index < 3; index++) {
             let frontFace = document.createElement('div');
             if (index == 1) {
@@ -99,8 +100,7 @@ class cardObject {
             theFront.appendChild(frontFace);
 
         }
-        this.element = cardDiv;
-    }
+        this.element = cardDiv;   }
 
     FlipCard() {
         this._frontParts.forEach(parts => {
@@ -146,6 +146,29 @@ class cardObject {
                 parts.innerText = newType;
             }
         });
+    }
+
+    setWin(isWin) {
+        if (isWin) {
+            this.element.classList.add('win');
+        } else {
+            this.element.classList.remove('win');
+        }
+    }
+
+    setDim(isDim) {
+    // Remove any existing dim overlay
+        const existingOverlay = this.element.querySelector('.dim-overlay');
+        if (existingOverlay) {
+            existingOverlay.remove();
+        }
+        
+        if (isDim) {
+            const overlay = document.createElement('div');
+            overlay.classList.add('cards-dim-overlay');
+            this.element.appendChild(overlay);
+        }
+
     }
 }
 
@@ -254,6 +277,7 @@ function PlayerJoin(drawNum = 0, location) {
         onPlayerJoin();
 
         CreatePlayerButtons();
+
 
     }
     else {
@@ -413,7 +437,6 @@ function getUserID(index)
 {
     return gameState.players[index].UserID;
 }
-
 
 window.RemoveLoading = RemoveLoading;
 window.AddBot = AddBot;

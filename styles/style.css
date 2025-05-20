@@ -6,7 +6,7 @@
 body {
     font-family: Roboto;
     font-size: 30px;
-    background: linear-gradient(to bottom, #371a46 0%, #000000 100%);
+    background: linear-gradient(to bottom, #e2e2e2);
     overflow: hidden;
 
 }
@@ -36,12 +36,16 @@ input {
 }
 
 .players-container {
-    width: 190px;
+    width: 160px;
     height: 30vh;
-    background-color: orange;
-    border: 2px solid black;
-    border-radius: 10px;
+    background: linear-gradient(180deg, #636363, #1f1f1f);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    color: #e0e0e0;
+    font-family: 'Inter', sans-serif;
     text-align: center;
+    color: white;
 }
 
 .others-container {
@@ -57,22 +61,34 @@ input {
 
 .header-container {
     display: flex;
-    height: 100px;
+    height: 75px;
     width: 100vw;
     font-weight: 1000;
     align-items: center;
     justify-content: space-between;
+    background: linear-gradient(to bottom, #5e70da, #4c5dce);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    border-bottom: 2px solid rgba(0, 0, 0, 0.2);
 }
 
 .title {
-    font-size: 2.5rem;           /* Make it significantly bigger */
-    letter-spacing: 2px;         /* Add breathing room between letters */
-    text-shadow: 2px 2px 5px #000; /* Add depth with shadow */
-    color: #ffffff;              /* Use a gold color for luxurious contrast */
-    text-align: center;
     position: absolute;
+    top: 2%;
     left: 50%;
-    transform: translateX(-50%);         
+    transform: translateX(-50%);
+    font-family: 'Segoe UI', 'Gill Sans', 'Trebuchet MS', sans-serif;
+    font-size: 40px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    text-align: center;
+    color: #f8f8f8;
+    text-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.6),
+        0 0 10px rgba(255, 255, 255, 0.2);
+    z-index: 1;
+    padding-bottom: 0.3em;
+    width: fit-content;
+    white-space: nowrap;
 }
 
 .game-container {
@@ -81,11 +97,15 @@ input {
     margin: 0 auto;
     font-size: 16px;
     color: white;
-    width: 1000px;
+    width: 850px;
     height: 75vh;
     box-shadow: none;
     border-radius: 15px;
+    margin-top: 20px;
 
+    transition: width 0.5s ease;
+
+    
 }
 
 .poker-table {
@@ -95,7 +115,7 @@ input {
     width: 100%;
     height: 100%;
     background: radial-gradient(circle, #2e7d4f, #1b5e3e);
-    border-radius: 300px / 200px;
+    border-radius: 30.5%;
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
 
     box-sizing: border-box;
@@ -105,7 +125,7 @@ input {
 
 .money-pot {
     position: absolute;
-    top: 30%;
+    top: 31%;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 1;
@@ -121,18 +141,19 @@ input {
 }
 
 .community-card-container {
-  display: flex;
+    display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
     width: 100%;
-    height: 140px;
+    height: 115px;
     border-radius: 10px 10px 0px 0px;
     
     position: absolute;
     top: 50%; 
     left: 50%; 
     transform: translate(-50%, -50%);
+    z-index: 2;
 }
 
 .player-card-container {
@@ -185,10 +206,8 @@ input {
     font-weight: 1000;
     background-color: rgb(0, 0, 0);
     color: rgb(255, 255, 255);
-    padding-left: 50px;
-    padding-right: 50px;
     border: 3px solid black;
-    width: 30px;
+    width: 110px;
     height: 17px;
     text-align: center;
 }
@@ -221,17 +240,60 @@ input {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 15px;
     width: 100%;
-    height: 80px; 
+    height: 70px; 
     border-radius: 0px 0px 10px 10px;
+
 }
 
 .table-player-card-container>.cards
 {
+    width: 45px;
+    height: 70px;
+}
+
+.table-player-container.me .table-player-card-container .cards {
     width: 55px;
     height: 80px;
+    margin-bottom: 10px;
+}
 
+.table-player-container.me .table-player-card-container .cards .the-front {
+    font-size: 5px;
+}
+
+.table-player-container.me .table-player-card-container .cards .updown-part {
+    font-size: 2.5vh;
+    
+}
+.table-player-container.me .table-player-card-container .cards .middle-part {
+    font-size: 6vh;
+}
+
+.table-player-container.me .table-player-money {
+    width: 130px;
+}
+
+.table-player-card-container>.cards::after
+{
+    padding: 3px;
+}
+
+.table-player-card-container>.cards>.the-back {
+    font-size: 10px;
+}
+
+.table-player-card-container>.cards>.the-front {
+    font-size: 5px;
+}
+
+.table-player-card-container>.cards>.the-front>.updown-part {
+    font-size: 2vh;
+    
+}
+.table-player-card-container>.cards>.the-front>.middle-part {
+    font-size: 4vh;
 }
 
 .others-card-container {
@@ -265,18 +327,19 @@ input {
 
 .others-card-container>.cards>.the-front>.updown-part {
     font-size: 13.5px;
-    
+
 }
 
 .others-card-container>.cards>.the-front>.middle-part {
     font-size: 30px;
+    
 }
 
 .cards {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100px;
+    width: 80px;
     height: 100%;
     color: black;
     
@@ -284,10 +347,21 @@ input {
     transform-style: preserve-3d;
     transition: transform 0.6s ease;
     position: relative;
-    transform: rotateY(0deg);
+    transform: rotateY(0deg);   
 
 }
 
+.cards-dim-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 10;
+    pointer-events: none;
+    border-radius: 10.0%;
+}
 
 .cards.flipped{
     transform: rotateY(180deg);
@@ -330,7 +404,7 @@ input {
 
 .middle-part {
     width: 100%;
-    height: 70%;
+    height: 60%;
     font-size: 8vh;
     display: flex;
     align-items: center;
@@ -342,21 +416,82 @@ input {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 15px;
+    font-size: 20px;
     width: 100%;
-    height: 15%;
+    height: 20%;
 
 }
 
 
-.cards.win {
-    border: 3px solid gold !important;
-    border-radius: 10%;
-    box-shadow: 0 0 15px gold !important;
-    margin: 0 5px;
-    transform: rotateY(180deg) scale(1.1) !important;
-
+.cards.flipped.win {
+   
+    border-radius: 11.5%;
+    margin: 0 1px;
 }
+
+.cards.flipped.dim {
+    filter: brightness(0.5);
+}
+
+@property --angle{
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
+}
+
+.cards.win::after, .cards.win::before{
+    content: '';
+    position: absolute;
+    height:100%;
+    width: 100%;
+    background: conic-gradient(from var(--angle), transparent 0%,
+  var(--hand-bg));
+    top:50%;
+    left:50%;
+    translate: -50% -50%;
+    z-index: -1;
+    padding: 3px;
+    border-radius: 11.5%;
+
+    animation: 3s spin linear infinite;
+}
+
+.cards.win::before{
+    filter: blur(1.0rem);
+    opacity: 0.9;
+}
+
+@keyframes spin{
+    from{
+        --angle: 0deg;
+    }
+    to{
+        --angle: 360deg;
+    }
+}
+
+.hand--high-card       { --hand-bg: white; }
+.hand--pair            { --hand-bg: rgb(184,115,51); }
+.hand--two-pair        { --hand-bg: rgb(205,127,50);}
+.hand--three-of-a-kind { --hand-bg: rgb(192,192,192); }
+.hand--straight        { --hand-bg: rgb(255,215,0); }
+.hand--flush           { --hand-bg: rgb(229,228,226); }
+.hand--full-house      { --hand-bg: rgb(237,242,247); }
+.hand--four-of-a-kind  { --hand-bg: rgb(128,0,128); }
+.hand--straight-flush  { --hand-bg: rgb(255,0,0); }
+.hand--royal-flush {
+  --hand-bg: 
+    red    0%,
+    orange 14%,
+    yellow 28%,
+    green  42%,
+    blue   56%,
+    indigo 70%,
+    violet 84%,
+    red   100%
+  ;
+}
+
 .btn-container {
     display: flex;
     gap: 10px;
@@ -369,42 +504,46 @@ input {
 }
 
 .game-btn {
-    margin: 0 5px 0 5px;
-    background: linear-gradient(to bottom, rgb(255, 179, 36) 0%, rgb(255, 140, 36) 100%);
-    color: rgb(0, 0, 0);
-    font-family: 'Roboto';
-    font-weight: 700;
-    font-size: 20px;
-    width: 100px;
-    height: 50px;
-    border-radius: 5%;
-    border:none;
-    transition: all 0.3 ease;
-    border: 1px solid black;
-    
+    margin: 0 8px;
+    background: linear-gradient(to bottom right, #3f51b5, #5c6bc0); /* soft indigo gradient */
+    color: #fff;
+    font-family: 'Segoe UI', 'Roboto', sans-serif;
+    font-weight: 600;
+    font-size: 18px;
+    width: 110px;
+    height: 48px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+    z-index: 5;
 }
+
 
 .game-btn:hover {
     transform: scale(1.05);
     transform: translateY(-2px);
     background: linear-gradient(to bottom, rgb(255, 189, 66) 0%, rgb(255, 152, 62) 100%);
     cursor: pointer;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
 }
 
 .join-btn {
     margin: 0 5px 0 5px;
-    background: linear-gradient(to bottom, rgb(59, 237, 50) 0%, rgb(32, 147, 57) 100%);
-    color: rgb(0, 0, 0);
+    background: linear-gradient(to bottom right, #c14747, #9a3232); /* soft indigo gradient */
+    color: #fff;
     font-family: 'Roboto';
     font-weight: 700;
     font-size: 20px;
     width: 100px;
     height: 50px;
-    border-radius: 5%;
-    border:none;
+    border: none;
+    border-radius: 12px;
     transition: all 0.3 ease;
-    top:170%;
-    position: relative;
+    cursor: pointer;
 }
 
 .join-btn:hover {
@@ -432,7 +571,60 @@ input {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.43); /* #0000006d is equivalent to 0.43 alpha */
+    background-color: rgba(0, 0, 0, 0.6); /* #0000006d is equivalent to 0.43 alpha */
     pointer-events: none;   /* so clicks go through, optional */
-    z-index: 0;   
+
+    z-index: 1;
+}
+
+.winner {
+    position: absolute;
+    top: 28%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: 700;
+    font-size: 28px;
+    color: gold;
+    text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.8);
+    letter-spacing: 1px;
+    animation: pop-in 0.4s ease-out;
+}
+
+.hand-type {
+    position: absolute;
+    top: 33%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: 600;
+    font-size: 22px;
+    color: white;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+    letter-spacing: 0.5px;
+    animation: fade-in 0.6s ease-out;
+}
+
+@keyframes pop-in {
+    from {
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 0;
+    }
+    to {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -45%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
 }

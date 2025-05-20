@@ -17,7 +17,7 @@ const positions = {
 
 function createPlayers() {
   const table = document.querySelector('.poker-table');
-  
+
   let numOfPlayers = gameState.players.length;
   let index = gameState.players.findIndex(p => p.Name === "ME");
   index = (index === -1) ? 0 : index;
@@ -119,6 +119,11 @@ function addPlayer(ind, key) {
   playerContainer.style.transform = 'translate(-50%, -50%)';
   playerContainer.id = `player-${getUserID(ind)}`;
 
+  if (getName(ind)=="ME")
+  {
+    playerContainer.classList.add('me');
+  }
+
   const cardContainer = document.createElement('div');
   cardContainer.classList.add('table-player-card-container');
 
@@ -170,7 +175,7 @@ function addPlayer(ind, key) {
   bubble.classList.add('show');
   playerContainer.appendChild(bubble); 
 
-  console.log(playerContainer.id +"ids");
+  //console.log(playerContainer.id +"ids");
 
   table.appendChild(playerContainer);
 

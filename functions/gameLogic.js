@@ -1,4 +1,4 @@
-import { gameState, cardObject, playerObject } from "../script.js";
+import { gameState, cardObject, playerObject, getUserID } from "../script.js";
 import { createPlayers } from "../addPlayers.js";
 
 const _FALSE = false;
@@ -24,12 +24,16 @@ function MonitorPlayers() {
 }
 
 function StartGameLoop() {
-    const startBtn = document.querySelector('#community-container-id .main-btn');
-    if (startBtn) startBtn.remove();
 
-    RemoveJoinButton();
+    if(gameState.firstGame)
+    {
+        const startBtn = document.querySelector('#community-container-id .main-btn');
+        if (startBtn) startBtn.remove();
 
-    createPlayers();
+        RemoveJoinButton();
+
+        createPlayers();
+    }
 
     gameState.isGameRunning = true;
     let DelayMultiplier = 1;
@@ -42,6 +46,13 @@ function StartGameLoop() {
 
     GameLoop();
 
+}
+
+function ContinueGame()
+{
+    if(gameState.firstGame)
+        gameState.firstGame=false;
+    StartGameLoop();
 }
 
 function RemoveJoinButton() {
@@ -61,6 +72,7 @@ async function GameLoop() {
     console.log("breakFlag check:" + BreakFlag);
     if (BreakFlag) {
         console.log("Finished in the 1st round");
+        await ShowCards();
         await ResetGame();
         await EndGame(null, true);
         return;
@@ -74,6 +86,7 @@ async function GameLoop() {
 
     if (BreakFlag) {
         console.log("Finished in the 2nd round");
+        await ShowCards();
         await ResetGame();
         await EndGame(null, true);
         return;
@@ -92,7 +105,9 @@ async function GameLoop() {
     await new Promise(resolve => setTimeout(resolve, 2000));
     //so it doesn't show all cards and hightlight at the same sec
 
-    HighlightWinningCards(winner.BestHand.contributingCards);
+    AnnounceWinner(winner);
+    HighlightWinningCards(winner);
+    ShowEndGameButtons();
 
     await ResetGame();
 }
@@ -465,6 +480,40 @@ function HidePlayerButtons() {
     callBtn.style.display = 'none';
     raiseBtn.style.display = 'none';
     foldBtn.style.display = 'none';
+}
+
+function ShowEndGameButtons() {
+    const btnContainer = document.getElementById('player-btn-container-id');
+
+    // Optionally hide player buttons if not already hidden
+    HidePlayerButtons();
+
+    // Create Continue button
+    const continueBtn = document.createElement('button');
+    continueBtn.className = 'game-btn';
+    continueBtn.id = 'continue-btn-id';
+    continueBtn.innerText = 'CONTINUE';
+
+    // Create Exit button
+    const exitBtn = document.createElement('button');
+    exitBtn.className = 'game-btn';
+    exitBtn.id = 'exit-btn-id';
+    exitBtn.innerText = 'EXIT';
+
+    // Append to container
+    btnContainer.appendChild(continueBtn);
+    btnContainer.appendChild(exitBtn);
+
+    // Add event listeners
+    continueBtn.addEventListener('click', () => {
+        console.log('CONTINUE clicked');
+        // Restart game logic here
+    });
+
+    exitBtn.addEventListener('click', () => {
+        console.log('EXIT clicked');
+        // Go back to main menu or close game
+    });
 }
 
 
@@ -875,6 +924,27 @@ async function EndGame(winnerPtr, Flag) {
     console.log("Debug Bet Sum = " + gameState.betSum);
     console.log("Debug Debt = " + winner.Debt);
     console.log(gameState.players.filter(p => !p.HasFolded));
+    
+}
+
+function AnnounceWinner(winner)
+{
+    let moneyPot = document.getElementById("money-pot");
+    moneyPot.style.display = "none";
+
+    let winnerAnnouncement = document.getElementById("winner");
+    let winnerName = winner.Name;
+    if(winnerName==="ME") //ovo je privremeno, nece ovo biti uslovno u finalnoj verziji :)
+        winnerAnnouncement.textContent= "You win " + "$" +gameState.betSum;
+    else
+        winnerAnnouncement.textContent= winner.Name + " wins " + "$" +gameState.betSum;
+
+    let handType = document.getElementById("hand-type");
+    let winnerType =winner.BestHand.type;
+    if(winnerType=="Straight" || winnerType=="Royal")
+        winnerType += " Flush";
+
+    handType.textContent="·"+ winnerType+"· ";
 }
 
 
@@ -922,15 +992,39 @@ function GetContributingCards(hand, type, histo)
     }
 }
 
-function HighlightWinningCards(contributingCards)
+function HighlightWinningCards(winner)
 { 
-   
-    contributingCards.forEach(card => {
-        if (card.element) {  // Safety check
-            card.element.classList.add('win');
+    const dimoverlay = document.createElement('div');
+    dimoverlay.classList.add('dim-overlay');
+    document.body.appendChild(dimoverlay);
 
+    let winnerIndex = gameState.players.findIndex(player => player === winner);
+    let idContainer = `player-${getUserID(winnerIndex)}`;
+    let container = document.getElementById(idContainer);
+    container.style.zIndex=3;
+   
+    let contributingCards = winner.BestHand.contributingCards;
+
+    let allCards = [...winner.Cards, ...gameState.communityCards];
+
+    const handKey = winner.BestHand.type.toLowerCase().replace(/\s+/g,'-');
+
+    allCards.forEach(card => {
+        if (contributingCards.includes(card)) {  // Safety check
+            card.setWin(true);
+            card.element.classList.add(`hand--${handKey}`);
+        }
+        else 
+        {
+            card.setDim(true);
         }
     });
+
+    let idUsername = `name-${getUserID(winnerIndex)}`;
+    let containerUsername = document.getElementById(idUsername);
+    containerUsername.style.backgroundColor = "gold";
+
+
 }
 
 export { GameLoop, MonitorPlayers, }
