@@ -25,8 +25,7 @@ function MonitorPlayers() {
 
 function StartGameLoop() {
 
-    if(gameState.firstGame)
-    {
+    if (gameState.firstGame) {
         const startBtn = document.querySelector('#community-container-id .main-btn');
         if (startBtn) startBtn.remove();
 
@@ -48,10 +47,9 @@ function StartGameLoop() {
 
 }
 
-function ContinueGame()
-{
-    if(gameState.firstGame)
-        gameState.firstGame=false;
+function ContinueGame() {
+    if (gameState.firstGame)
+        gameState.firstGame = false;
     StartGameLoop();
 }
 
@@ -64,66 +62,88 @@ function RemoveJoinButton() {
 
 async function GameLoop() {
     await new Promise(resolve => { setTimeout(resolve, 1500) });
-    console.log(gameState.players);
     await PlaceBets(true);
+
+    let breakFlag = EarlyEndCheck();
+    if (breakFlag === true) {
+        return;
+    }
+
     await CommunityDeal(3);
 
-    let BreakFlag = await BreakGame();
-    console.log("breakFlag check:" + BreakFlag);
-    if (BreakFlag) {
-        console.log("Finished in the 1st round");
-        await ShowCards();
-        await ResetGame();
-        await EndGame(null, true);
-        return;
-    }
     await new Promise(resolve => { setTimeout(resolve, 1500) });
     await PlaceBets();
+
+    breakFlag = EarlyEndCheck();
+    if (breakFlag === true) {
+        return;
+    }
+
     await CommunityDeal();
 
-    BreakFlag = await BreakGame();
-    console.log("breakFlag check:" + BreakFlag);
-
-    if (BreakFlag) {
-        console.log("Finished in the 2nd round");
-        await ShowCards();
-        await ResetGame();
-        await EndGame(null, true);
-        return;
-    }
     await new Promise(resolve => { setTimeout(resolve, 1500) });
     await PlaceBets();
+
+    breakFlag = EarlyEndCheck();
+    if (breakFlag === true) {
+        return;
+    }
+
     await CommunityDeal();
     await PlaceBets();
 
-    //TODO: show all cards
+    breakFlag = EarlyEndCheck();
+    if (breakFlag === true) {
+        return;
+    }
+
+    await EndCheck();
+}
+function BreakGame() {
+
+    let activePlayers = gameState.players.filter(p => !p.HasFolded);
+    if (activePlayers.length <= 1) {
+        console.log("ActivePlayer check for true: " + activePlayers.length);
+        return ({ flag: true, playerObject: activePlayers[0] });
+
+    }
+    console.log("ActivePlayer check for false: " + activePlayers.length);
+    return ({ flag: false, playerObject: null });
+
+}
+
+function EarlyEndCheck() {
+    let { flag, playerObject } = BreakGame();
+    console.log("break game flag triggered: " + flag);
+    if (flag) {
+        console.log("Game finished after the 1st round");
+
+        EndGame(null, true);
+        ShowCards();
+
+        AnnounceWinnerFromFold(playerObject);
+        HighlightWinningAfterFold();
+        ShowEndGameButtons();
+        ResetGame();
+        return true;
+    }
+    return false;
+}
+
+async function EndCheck() {
     const winner = await CompareHands();
-    await EndGame(winner, false);
+    EndGame(winner, false);
 
-    await ShowCards();
-
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    //so it doesn't show all cards and hightlight at the same sec
-
+    ShowCards();
+    
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
     AnnounceWinner(winner);
     HighlightWinningCards(winner);
     ShowEndGameButtons();
+    ResetGame();
+}
 
-    await ResetGame();
-}
-async function BreakGame() {
-    return new Promise(resolve => {
-        let activePlayers = gameState.players.filter(p => !p.HasFolded);
-        if (activePlayers.length <= 1) {
-            console.log("ActivePlayer check for true: " + activePlayers.length);
-            resolve(true);
-            return;
-        }
-        console.log("ActivePlayer check for false: " + activePlayers.length);
-        resolve(false);
-        return;
-    })
-}
 async function PlaceBets(FirstRound = false) {
 
     //activePlayers - arr of all the players that didnt fold
@@ -142,7 +162,7 @@ async function PlaceBets(FirstRound = false) {
     let lastToRaiseIndex = -1;
 
     activePlayers.forEach(player => {
-    player.hasPlayedBefore = false;
+        player.hasPlayedBefore = false;
     });
 
     while (activePlayers.length > 1) {
@@ -175,9 +195,9 @@ async function PlaceBets(FirstRound = false) {
                     currentPlayer.Money -= (amount - currentPlayer.Bet);
 
                     UpdateMoney(currentPlayer.UserID, currentPlayer.Money);
-   
+
                     currentPlayer.Bet += (amount - currentPlayer.Bet);
-                    
+
                     console.log("-----------------------------------");
                     console.log(
                         `%cThe bot has called: ${currentPlayer.Name} | ${currentPlayer.UserID}`,
@@ -199,7 +219,7 @@ async function PlaceBets(FirstRound = false) {
                     currentPlayer.Money -= amount;
 
                     UpdateMoney(currentPlayer.UserID, currentPlayer.Money);
-                    
+
                     currentPlayer.Bet += amount;
 
                     maxBet = currentPlayer.Bet;
@@ -253,19 +273,19 @@ async function PlaceBets(FirstRound = false) {
         console.log("-------------------------------");
         console.log(" ");
         //TODO: add a check if everyone has played at least once.
-        
+
         if ((currentIndex === lastToRaiseIndex)) {
             let allMatched = activePlayers.every(p => p.Bet === maxBet);
             if (allMatched) break;
         }
 
-           const everyonePlayedOnce = activePlayers.every(p => p.hasPlayedBefore);
-           const allMatched = activePlayers.every(p => p.Bet === maxBet);
-           if (everyonePlayedOnce && allMatched) 
+        const everyonePlayedOnce = activePlayers.every(p => p.hasPlayedBefore);
+        const allMatched = activePlayers.every(p => p.Bet === maxBet);
+        if (everyonePlayedOnce && allMatched)
             break;
 
     }
- 
+
 
     gameState.players.forEach(player => {
         gameState.betSum += player.Bet;
@@ -326,12 +346,12 @@ function getPlayerAction(player, maxBet, FirstRound) {
             return;
         }
         else if (maxBet < 2 && FirstRound) {
-                let amount = maxBet + 1;
-                setTimeout(() => { resolve({ action: callActions[0], amount: amount }); }, RoundSpeed());
-                if (amount == '1') ShowAction('Small blind', player.UserID);
-                else if (amount == '2') ShowAction('Big blind', player.UserID);
-                return;
-            }
+            let amount = maxBet + 1;
+            setTimeout(() => { resolve({ action: callActions[0], amount: amount }); }, RoundSpeed());
+            if (amount == '1') ShowAction('Small blind', player.UserID);
+            else if (amount == '2') ShowAction('Big blind', player.UserID);
+            return;
+        }
         else {
 
             ShowPlayerButtons();
@@ -353,13 +373,13 @@ function getPlayerAction(player, maxBet, FirstRound) {
                 console.log("You have called.");
                 setTimeout(() => {
                     resolve({ action: 'call', amount: maxBet });
-                }, 2000); 
-                
+                }, 2000);
+
             }
 
             function onRaise() {
 
-             
+
                 let amount;
 
                 while (true) {
@@ -379,7 +399,7 @@ function getPlayerAction(player, maxBet, FirstRound) {
                 console.log("You have raised to " + amount);
                 setTimeout(() => {
                     resolve({ action: 'raise', amount: amount });
-                }, 2000); 
+                }, 2000);
                 return;
 
                 ShowAction("Raise", player.UserID, amount);
@@ -393,7 +413,7 @@ function getPlayerAction(player, maxBet, FirstRound) {
                 console.log("You have folded");
                 setTimeout(() => {
                     resolve({ action: 'fold', amount: 0 });
-                }, 2000); 
+                }, 2000);
             }
 
             callBtn.addEventListener('click', onCall);
@@ -437,8 +457,7 @@ function showFold(userID) {
 
 }
 
-function ShowTurn(userID)
-{
+function ShowTurn(userID) {
     const id = `player-${userID}`;
     const tableContainer = document.getElementById(id);
 
@@ -453,8 +472,7 @@ function UpdateMoney(userID, Money) {
     moneyElement.textContent = "$" + Money;
 }
 
-function UpdateMoneyPot(bet)
-{
+function UpdateMoneyPot(bet) {
     let id = `money-pot`;
     let moneyPot = document.getElementById(id);
     moneyPot.textContent = "BET: $" + bet;
@@ -647,10 +665,10 @@ async function evaluateHand(hands, playerName) {
                 hand: hands[index],
                 contributingCards: null
             };
-            if(straightFlush.type==='Royal Flush')
-                straightFlush.contributingCards=GetContributingCards(hands[index], 'Royal Flush', histoInfo[index])
+            if (straightFlush.type === 'Royal Flush')
+                straightFlush.contributingCards = GetContributingCards(hands[index], 'Royal Flush', histoInfo[index])
             else
-                straightFlush.contributingCards=GetContributingCards(hands[index], 'Straight Flush', histoInfo[index])
+                straightFlush.contributingCards = GetContributingCards(hands[index], 'Straight Flush', histoInfo[index])
 
             if (!BestHand || rankOrder[straightFlush.rank] > rankOrder[BestHand.rank]) {
                 BestHand = straightFlush;
@@ -897,14 +915,14 @@ const combinations = (n, k) => {
 }
 
 
-async function ResetGame() {
+function ResetGame() {
     console.log("RESET GAME");
     gameState.firstToAct++;
     gameState.betSum = 0;
 }
 
 //opcioni com : botovi koji odu u - bice izbaceni iz gamea
-async function EndGame(winnerPtr, Flag) {
+function EndGame(winnerPtr, Flag) {
     let winner;
     if (Flag) {
         let player = gameState.players.filter(p => !p.HasFolded)
@@ -924,30 +942,52 @@ async function EndGame(winnerPtr, Flag) {
     console.log("Debug Bet Sum = " + gameState.betSum);
     console.log("Debug Debt = " + winner.Debt);
     console.log(gameState.players.filter(p => !p.HasFolded));
-    
+
 }
 
-function AnnounceWinner(winner)
-{
-    let moneyPot = document.getElementById("money-pot");
-    moneyPot.style.display = "none";
+function AnnounceWinner(winner) {
+
+    DisableMoneyPot();
+    DisableDealerTitle();
 
     let winnerAnnouncement = document.getElementById("winner");
     let winnerName = winner.Name;
-    if(winnerName==="ME") //ovo je privremeno, nece ovo biti uslovno u finalnoj verziji :)
-        winnerAnnouncement.textContent= "You win " + "$" +gameState.betSum;
-    else
-        winnerAnnouncement.textContent= winner.Name + " wins " + "$" +gameState.betSum;
+    winnerAnnouncement.textContent = (winnerName === "ME") ? "You win " + "$" + gameState.betSum : winner.Name + " wins " + "$" + gameState.betSum;
 
-    let handType = document.getElementById("hand-type");
-    let winnerType =winner.BestHand.type;
-    if(winnerType=="Straight" || winnerType=="Royal")
-        winnerType += " Flush";
+    AnnounceHandType(winner);
+}
+function AnnounceWinnerFromFold(winner) {
 
-    handType.textContent="·"+ winnerType+"· ";
+    DisableMoneyPot();
+    DisableDealerTitle();
+
+    let winnerAnnouncement = document.getElementById("winner");
+    let winnerName = winner.Name;
+    winnerAnnouncement.textContent = (winnerName === "ME") ? "You win " + "$" + gameState.betSum : winner.Name + " wins " + "$" + gameState.betSum;
+    AnnounceFoldWin();
 }
 
+function DisableMoneyPot() {
+    let moneyPot = document.getElementById("money-pot");
+    moneyPot.style.display = "none";
+}
 
+function AnnounceHandType(winner) {
+    let handType = document.getElementById("hand-type");
+    let winnerType = winner.BestHand.type;
+    if (winnerType == "Straight" || winnerType == "Royal")
+        winnerType += " Flush";
+
+    handType.textContent = "·" + winnerType + "· ";
+}
+function AnnounceFoldWin() {
+    let handType = document.getElementById("hand-type");
+    handType.textContent = "·Everyone Folded· ";
+}
+
+function DisableDealerTitle() {
+    document.querySelector("#dealer-id").innerText = " ";
+}
 
 //ide od igraca do igraca i tera da donesu odluku
 //event listener ceka da se izvrsi neka od 3 funk i tako u krug za sve
@@ -955,9 +995,8 @@ function AnnounceWinner(winner)
 //za bota- kad bot treba da bira, ovde treba neki AI idk
 
 
-function GetContributingCards(hand, type, histo)
-{
-    switch(type) {
+function GetContributingCards(hand, type, histo) {
+    switch (type) {
         case 'Royal Flush':
         case 'Straight Flush':
         case 'Flush':
@@ -967,64 +1006,86 @@ function GetContributingCards(hand, type, histo)
         case 'Four Of A Kind':
             const quadRank = histo.byCountThenRank[0][0];
             return hand.filter(c => c.Name == quadRank); //filtriraj samo 4 karte sa istim rankom
-        
+
         case 'Full House':
             return [...hand]; //vrati sve 5 jer je 3ranka + 2ranka
 
         case 'Three Of A Kind':
             const tripsRank = histo.byCountThenRank[0][0];
-            return hand.filter(c=> c.Name == tripsRank); // kao four of a kind
-        
+            return hand.filter(c => c.Name == tripsRank); // kao four of a kind
+
         case 'Two Pair':
             const firstPairRank = histo.byCountThenRank[0][0];
             const secondPairRank = histo.byCountThenRank[1][0];
-            return hand.filter(c=> c.Name == firstPairRank || c.Name == secondPairRank);
+            return hand.filter(c => c.Name == firstPairRank || c.Name == secondPairRank);
 
         case 'Pair':
             const pairRank = histo.byCountThenRank[0][0];
-            return hand.filter(c=> c.Name == pairRank);
-            
+            return hand.filter(c => c.Name == pairRank);
+
         case 'High Card':
-            return [hand.sort((a,b)=>rankOrder[b.Name]-rankOrder[a.Name])[0]];
-            
+            return [hand.sort((a, b) => rankOrder[b.Name] - rankOrder[a.Name])[0]];
+
         default:
-            return [];    
+            return [];
     }
 }
 
-function HighlightWinningCards(winner)
-{ 
-    const dimoverlay = document.createElement('div');
-    dimoverlay.classList.add('dim-overlay');
-    document.body.appendChild(dimoverlay);
+function HighlightWinningCards(winner) {
+    DimOverlay();
 
-    let winnerIndex = gameState.players.findIndex(player => player === winner);
-    let idContainer = `player-${getUserID(winnerIndex)}`;
-    let container = document.getElementById(idContainer);
-    container.style.zIndex=3;
-   
-    let contributingCards = winner.BestHand.contributingCards;
+   const winnerIndex = OffsetByIndex(winner);
+
+    const contributingCards = winner.BestHand.contributingCards;
 
     let allCards = [...winner.Cards, ...gameState.communityCards];
 
-    const handKey = winner.BestHand.type.toLowerCase().replace(/\s+/g,'-');
+    const handKey = winner.BestHand.type.toLowerCase().replace(/\s+/g, '-');
 
     allCards.forEach(card => {
         if (contributingCards.includes(card)) {  // Safety check
             card.setWin(true);
             card.element.classList.add(`hand--${handKey}`);
         }
-        else 
-        {
+        else {
             card.setDim(true);
         }
     });
 
+    GoldWinnerBackgound(winnerIndex);
+}
+
+function HighlightWinningAfterFold() {
+    DimOverlay();
+    let winnerIndex = OffsetByIndex();
+    GoldWinnerBackgound(winnerIndex);
+}
+
+function OffsetByIndex(winner = null) {
+    let winnerIndex;
+    if (winner !== undefined) {
+        winnerIndex = gameState.players.findIndex(player => player === winner);
+    }
+    else {
+        winnerIndex = gameState.players.findIndex(player => !player.HasFolded);
+    }
+    let idContainer = `player-${getUserID(winnerIndex)}`;
+    let container = document.getElementById(idContainer);
+    container.style.zIndex = 3;
+    return winnerIndex;
+}
+
+function DimOverlay() {
+    const dimoverlay = document.createElement('div');
+    dimoverlay.classList.add('dim-overlay');
+    document.body.appendChild(dimoverlay);
+    return;
+}
+function GoldWinnerBackgound(winnerIndex) {
     let idUsername = `name-${getUserID(winnerIndex)}`;
     let containerUsername = document.getElementById(idUsername);
     containerUsername.style.backgroundColor = "gold";
-
-
+    return;
 }
 
 export { GameLoop, MonitorPlayers, }

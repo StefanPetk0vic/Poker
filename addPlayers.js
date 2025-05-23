@@ -165,6 +165,7 @@ function addPlayer(ind, key) {
   if(getUserID(ind)==0)
   {
       title.innerHTML = "DEALER";
+      title.id="dealer-id";
   }
 
   const bubble = document.createElement('div');
