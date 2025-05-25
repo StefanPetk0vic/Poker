@@ -1,6 +1,8 @@
 import { GameLoop, MonitorPlayers } from "./functions/gameLogic.js";
 // clubs (♣), diamonds (♦), hearts (♥) and spades (♠)
 
+document.querySelector('.start-btn').addEventListener('click', RemoveLoading);
+
 //#region Variables
 const Types = ["♣", "♠", "♦", "♥"];
 const CardNames = ["A", "J", "Q", "K"];
@@ -442,4 +444,4 @@ window.PlayerJoin = PlayerJoin;
 window.DisplayCard = DisplayCard;
 window.ShowCards = ShowCards;
 
-export { gameState, cardObject, ShowCards, playerObject, getCards, getName, getMoney, getUserID, ShuffleDeck,GenerateDeck, RemoveCommunityCards };
+export { gameState, cardObject, ShowCards, playerObject, getCards, getName, getMoney, getUserID, ShuffleDeck,GenerateDeck, RemoveCommunityCards, RemoveLoading };

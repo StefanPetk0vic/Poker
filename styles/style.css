@@ -153,7 +153,7 @@ input {
     top: 50%; 
     left: 50%; 
     transform: translate(-50%, -50%);
-    z-index: 2;
+    z-index: 11;
 }
 
 .player-card-container {
@@ -358,7 +358,7 @@ input {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.6);
-    z-index: 10;
+    z-index: 11;
     pointer-events: none;
     border-radius: 10.0%;
 }
@@ -518,7 +518,7 @@ input {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 
-    z-index: 5;
+    z-index: 11;
 }
 
 
@@ -574,7 +574,7 @@ input {
     background-color: rgba(0, 0, 0, 0.6); /* #0000006d is equivalent to 0.43 alpha */
     pointer-events: none;   /* so clicks go through, optional */
 
-    z-index: 1;
+    z-index: 10;
 }
 
 .winner {
@@ -582,7 +582,7 @@ input {
     top: 28%;
     left: 50%;
     transform: translate(-50%, -50%);
-    z-index: 2;
+    z-index: 11;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     font-weight: 700;
     font-size: 28px;
@@ -597,7 +597,7 @@ input {
     top: 33%;
     left: 50%;
     transform: translate(-50%, -50%);
-    z-index: 2;
+    z-index: 11;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     font-weight: 600;
     font-size: 22px;

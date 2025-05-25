@@ -15,7 +15,7 @@ const positions = {
   10: { top: '85%', left: '70%' }
 };
 
-function createPlayers() {
+function CreatePlayers() {
   const table = document.querySelector('.poker-table');
 
   let numOfPlayers = gameState.players.length;
@@ -39,7 +39,7 @@ function createPlayers() {
 
   let j = 0;
 
-  addPlayer(lineupIndexes[j++], 1);
+  AddPlayer(lineupIndexes[j++], 1);
 
   numOfPlayers -= 1;
 
@@ -60,41 +60,49 @@ function createPlayers() {
   bot = numOfPlayers;
 
   if (bot >= 1) {
-    addPlayer(lineupIndexes[j++], 2);
+    AddPlayer(lineupIndexes[j++], 2);
   }
 
   if (left == 1) {
-    addPlayer(lineupIndexes[j++], 3.5);
+    AddPlayer(lineupIndexes[j++], 3.5);
   }
   else if (left == 2) {
-    addPlayer(lineupIndexes[j++], 3);
-    addPlayer(lineupIndexes[j++], 4);
+    AddPlayer(lineupIndexes[j++], 3);
+    AddPlayer(lineupIndexes[j++], 4);
   }
 
   if (top == 1) {
-    addPlayer(lineupIndexes[j++], 6);
+    AddPlayer(lineupIndexes[j++], 6);
   }
   else if (top == 2) {
-    addPlayer(lineupIndexes[j++], 5);
-    addPlayer(lineupIndexes[j++], 7);
+    AddPlayer(lineupIndexes[j], 5);
+    AdjustZIndex(lineupIndexes[j++]);
+    AddPlayer(lineupIndexes[j++], 7);
+    AdjustZIndex(lineupIndexes[j++]);
+   
   }
   else if (top == 3) {
-    addPlayer(lineupIndexes[j++], 5);
-    addPlayer(lineupIndexes[j++], 6);
-    addPlayer(lineupIndexes[j++], 7);
+    AddPlayer(lineupIndexes[j], 5);
+    AdjustZIndex(lineupIndexes[j++]);
+    AddPlayer(lineupIndexes[j], 6);
+    AdjustZIndex(lineupIndexes[j++]);
+    AddPlayer(lineupIndexes[j], 7);
+    AdjustZIndex(lineupIndexes[j++]);
   }
 
   if (right == 1) {
-    addPlayer(lineupIndexes[j++], 8.5);
+    AddPlayer(lineupIndexes[j++], 8.5);
   }
   else if (right == 2) {
-    addPlayer(lineupIndexes[j++], 8);
-    addPlayer(lineupIndexes[j++], 9);
+    AddPlayer(lineupIndexes[j++], 8);
+    AddPlayer(lineupIndexes[j++], 9);
   }
 
   if (bot == 2) {
-    addPlayer(lineupIndexes[j++], 10);
+    AddPlayer(lineupIndexes[j++], 10);
   }
+
+  CreateSpeechBubbles(gameState.players.length);
 
 }
 
@@ -104,7 +112,7 @@ function RemovePlayer() {
   players.forEach(player => player.remove());
 }
 
-function addPlayer(ind, key) {
+function AddPlayer(ind, key) {
   const table = document.querySelector('.poker-table');
   const position = positions[key];
 
@@ -119,22 +127,33 @@ function addPlayer(ind, key) {
   if (getName(ind) == "ME") {
     playerContainer.classList.add('me');
   }
+  
+  CreateCardContainer(ind, playerContainer);
 
+  CreateInfoContainer(ind, playerContainer);
+
+  table.appendChild(playerContainer);
+
+}
+
+function CreateCardContainer(ind, playerContainer)
+{
   const cardContainer = document.createElement('div');
   cardContainer.classList.add('table-player-card-container');
 
   let cards = getCards(ind);
 
-  for (let i = 0; i < 2; i++) {
+  for (let i = 0; i<2; i++)
+  {
     const card = cards[i];
-    // Clone the card element to avoid removing it from othersContainer
-    //const clonedCard = card.element.cloneNode(true);
     cardContainer.appendChild(card.element);
   }
 
-
   playerContainer.appendChild(cardContainer);
+}
 
+function CreateInfoContainer(ind, playerContainer)
+{
   let infoUser = document.createElement('div');
   infoUser.classList.add('table-player-info');
 
@@ -143,7 +162,6 @@ function addPlayer(ind, key) {
   moneyUser.innerHTML = `$${getMoney(ind)}`
   moneyUser.id = `money-${getUserID(ind)}`;
   infoUser.appendChild(moneyUser);
-
 
   let userP = document.createElement('div');
   userP.classList.add('table-player-username');
@@ -155,27 +173,44 @@ function addPlayer(ind, key) {
   title.classList.add('table-player-title')
   infoUser.appendChild(title);
 
+  AddDealerTitle(ind, title);
+
   playerContainer.appendChild(infoUser);
+}
 
-
+function AddDealerTitle(ind, title)
+{
   if (getUserID(ind) == (gameState.firstToAct-1 + gameState.players.length)%gameState.players.length) {
     title.innerHTML = "DEALER";
     title.id = "dealer-id";
   }
-
-  const bubble = document.createElement('div');
-  bubble.classList.add('bubble');
-  bubble.textContent = "action";
-  bubble.id = `bubble-${getUserID(ind)}`;
-  bubble.style.opacity = 0;
-  bubble.classList.add('show');
-  playerContainer.appendChild(bubble);
-
-  //console.log(playerContainer.id +"ids");
-
-  table.appendChild(playerContainer);
-
 }
 
+function CreateSpeechBubbles(numOfPlayers)
+{
+  for(let index = 0; index<numOfPlayers; index++)
+  {
+    const playerContainerId =  `player-${getUserID(index)}`;
+    const playerContainer = document.getElementById(playerContainerId);
 
-export { createPlayers, RemovePlayer }
+    const bubble = document.createElement('div');
+    bubble.classList.add('bubble');
+    bubble.textContent = "action";
+    bubble.id = `bubble-${getUserID(index)}`;
+    bubble.style.opacity = 0;
+    bubble.classList.add('show');
+    playerContainer.appendChild(bubble);
+  }
+}
+
+function AdjustZIndex(index)
+{
+  const playerContainerId =  `player-${getUserID(index)}`;
+  const playerContainer = document.getElementById(playerContainerId);
+  playerContainer.style.zIndex=9;
+}
+
+//dim na 10
+//community na 11
+
+export { CreatePlayers, RemovePlayer }
