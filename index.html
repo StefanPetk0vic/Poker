@@ -6,7 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/Styles/style.css">
     <link rel="stylesheet" href="/Styles/popup.css">
-
+    <link rel="stylesheet" href="/Styles/actionbubble.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <script type="module" src="script.js"></script>
+    <script type="module" src="./functions/popupController.js"></script>
     </link>
     <title>🃏Poker</title>
 </head>
@@ -15,46 +20,52 @@
     <header class="header-container">
         <div class="slider-container">slider</div>
         <p class="title">Texas hold'em </p>
-        <button class="info-btn"
+        <button class="info-btn" onclick="SettingsPopup()"
             style="font-size: 30px; text-align: center; background-color: rgb(255, 255, 255);">⚙️</button>
     </header>
     <div class="page-container">
         <div class="middle-section">
-            <aside class="others-container">
+
+            <div class="others-container">
                 <p class="player-count">Players:</p>
                 
                 <button  class="game-btn" value="2" id="add-bot" onclick="AddBot(value,this.id)">Add bot</button>
-            </aside>
-            <main class="game-container">
-                <p class="timer">clock:</p>
-                <p class="money-pot"> bet:</p>
+            </div>
+            <div class="game-container" id ="game-container-id">
+                <div class="poker-table">
 
-                <div class="community-card-container" id="community-container-id"></div>
-                <div class="player-card-container" id="player-container-id">
-                    <button class="game-btn" id="player-join"value="2" onclick="PlayerJoin(value,this.id)">Join</button>
+                    <p class="timer">clock:</p>
+                    <p class="money-pot" id="money-pot"></p>
+
+                    <div class="community-card-container" id="community-container-id"></div>
+                    <p class="winner" id="win"></p>
+                    <div class="player-card-container" id="player-container-id">
+                        <button class="join-btn" id="player-join"value="2" onclick="PlayerJoin(value,this.id)">JOIN</button>
+                    </div>
+                    </div>
+
+                    <p class="winner" id="winner"></p>
+                    <p class="hand-type" id="hand-type"></p>
                 </div>
-                <div class="btn-container">
-                    <button class="game-btn" onclick="DisplayCard()">CHECK</button>
-                    <button class="game-btn">ADD</button>
-                    <button class="game-btn">FOLD</button>
+                <div class="players-container">
+                    <p style="margin-bottom: 15px;" 15px;>Info:</p>
+                    <p style="text-align: left; margin: 0 0 15px 5px;">Name:</p>
+                    <p style="text-align: left; margin: 0 0 15px 5px;">Money:</p>
+                    <p style="text-align: left; margin: 0 0 15px 5px;">Debt:</p>
                 </div>
-            </main>
-            <aside class="players-container">
-                <p style="margin-bottom: 15px;" 15px;>Info:</p>
-                <p style="text-align: left; margin: 0 0 15px 5px;">Name:</p>
-                <p style="text-align: left; margin: 0 0 15px 5px;">Money:</p>
-                <p style="text-align: left; margin: 0 0 15px 5px;">Debt:</p>
-            </aside>
+            </div>
+
+            
         </div>
+        <div class="btn-container" id="player-btn-container-id"></div>
 
     </div>
-    <div class="popup-container" id="starting">
-        <div class="popup" id="start-game">
+    <div class="popup-container" id="starting-container-id">
+        <div class="popup" id="start-popup-id">
             <p class="info-txt">Welcome to Texas hold 'em game</p>
-            <button class="start-btn" onclick="StartGame()">START</button>
+            <button class="start-btn" onclick="RemoveLoading()">START</button>
         </div>
     </div>
+    
 </body>
-<script type="module" src="script.js"></script>
-
 </html>
