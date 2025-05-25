@@ -1,5 +1,5 @@
-import { gameState, cardObject, playerObject, getUserID } from "../script.js";
-import { createPlayers } from "../addPlayers.js";
+import { gameState, cardObject, playerObject, getUserID, ShuffleDeck, GenerateDeck, RemoveCommunityCards } from "../script.js";
+import { createPlayers, RemovePlayer } from "../addPlayers.js";
 
 const _FALSE = false;
 const _TRUE = true;
@@ -11,13 +11,18 @@ const rankOrder = {
 
 
 function MonitorPlayers() {
-    if (gameState.players.length === 2 && !gameState.isGameRunning) {
-        let StartButton = document.createElement('button');
-        StartButton.classList.add("main-btn");
-        StartButton.innerText = "START";
-        StartButton.addEventListener('click', StartGameLoop);
-        const CommunityContainer = document.getElementById('community-container-id');
-        CommunityContainer.appendChild(StartButton);
+    console.log(gameState.players.length);
+    console.log(gameState.isGameRunning);
+
+    if ((gameState.players.length >= 2) && (!gameState.isGameRunning)) {
+        if (document.querySelector(".main-btn") === null) {
+            let StartButton = document.createElement('button');
+            StartButton.classList.add("main-btn");
+            StartButton.innerText = "START";
+            StartButton.addEventListener('click', StartGameLoop);
+            const CommunityContainer = document.getElementById('community-container-id');
+            CommunityContainer.appendChild(StartButton);
+        }
     } else {
         console.log("Game already in session or not enough players...");
     }
@@ -25,14 +30,15 @@ function MonitorPlayers() {
 
 function StartGameLoop() {
 
-    if (gameState.firstGame) {
-        const startBtn = document.querySelector('#community-container-id .main-btn');
-        if (startBtn) startBtn.remove();
+    console.log("Game Started");
 
-        RemoveJoinButton();
 
-        createPlayers();
-    }
+    const startBtn = document.querySelector('#community-container-id .main-btn');
+    if (startBtn) startBtn.remove();
+
+    RemoveJoinButton();
+
+    createPlayers();
 
     gameState.isGameRunning = true;
     let DelayMultiplier = 1;
@@ -42,15 +48,14 @@ function StartGameLoop() {
             DelayMultiplier++;
         });
     }
-
+    FoldReset();
     GameLoop();
 
 }
-
-function ContinueGame() {
-    if (gameState.firstGame)
-        gameState.firstGame = false;
-    StartGameLoop();
+function FoldReset() {
+    gameState.players.forEach(player => {
+        player.HasFolded = false;
+    })
 }
 
 function RemoveJoinButton() {
@@ -61,6 +66,7 @@ function RemoveJoinButton() {
 }
 
 async function GameLoop() {
+
     await new Promise(resolve => { setTimeout(resolve, 1500) });
     await PlaceBets(true);
 
@@ -90,6 +96,8 @@ async function GameLoop() {
     }
 
     await CommunityDeal();
+
+    await new Promise(resolve => { setTimeout(resolve, 1500) });
     await PlaceBets();
 
     breakFlag = EarlyEndCheck();
@@ -122,9 +130,8 @@ function EarlyEndCheck() {
         ShowCards();
 
         AnnounceWinnerFromFold(playerObject);
-        HighlightWinningAfterFold();
+        HighlightWinningAfterFold(playerObject);
         ShowEndGameButtons();
-        ResetGame();
         return true;
     }
     return false;
@@ -135,13 +142,12 @@ async function EndCheck() {
     EndGame(winner, false);
 
     ShowCards();
-    
+
     await new Promise(resolve => setTimeout(resolve, 1500));
-    
+
     AnnounceWinner(winner);
     HighlightWinningCards(winner);
     ShowEndGameButtons();
-    ResetGame();
 }
 
 async function PlaceBets(FirstRound = false) {
@@ -503,9 +509,6 @@ function HidePlayerButtons() {
 function ShowEndGameButtons() {
     const btnContainer = document.getElementById('player-btn-container-id');
 
-    // Optionally hide player buttons if not already hidden
-    HidePlayerButtons();
-
     // Create Continue button
     const continueBtn = document.createElement('button');
     continueBtn.className = 'game-btn';
@@ -523,14 +526,46 @@ function ShowEndGameButtons() {
     btnContainer.appendChild(exitBtn);
 
     // Add event listeners
-    continueBtn.addEventListener('click', () => {
-        console.log('CONTINUE clicked');
-        // Restart game logic here
-    });
+    continueBtn.addEventListener('click', ContinueGame);
 
-    exitBtn.addEventListener('click', () => {
-        console.log('EXIT clicked');
-        // Go back to main menu or close game
+    exitBtn.addEventListener('click', ExitToStart);
+}
+
+
+function ContinueGame() {
+    ResetGameState();
+    if (gameState.players.length >= 2) {
+        console.log("CONTINUE");
+        StartGameLoop();
+        return;
+    }
+    MonitorPlayers();
+
+}
+function ExitToStart() {
+    ResetGameState();
+    MonitorPlayers();
+}
+
+function ResetGameState() {
+    gameState.firstToAct = (gameState.firstToAct + 1) % gameState.players.length;
+    gameState.betSum = 0;
+    gameState.currentPos = 0;
+    gameState.deck = [];
+    gameState.isGameRunning = false;
+    RemoveCommunityCards();
+    GenerateDeck();
+    ShuffleDeck();
+    RemovePlayer();
+    RemoveWinOverlay();
+    gameState.players.forEach(player => {
+        player.HasFolded = false;
+        player.Debt = 0;
+        player.Bet = 0;
+        player.BestHand = undefined;
+        for (let index = 0; index < player.Cards.length; index++) {
+            player.Cards[index] = gameState.deck[gameState.currentPos++];
+        }
     });
 }
 
@@ -538,11 +573,6 @@ function ShowEndGameButtons() {
 function RoundSpeed(Active = true) {
     if (Active) {
         return 1000 + Math.floor(Math.random() * 1500);
-        //u tome je i stvar dumbass da "razmisle" botovi.
-        //Ako zelis quick round onda stavi na false da ga ubrzas
-        // _FALSE i _TRUE da ga lakse nadjes i menjas
-
-        //jbt kad igras sah protiv racunara jel mu treba vreme da razmisli ili samo igra smhhhhhhh
     }
     return 0;
 }
@@ -556,9 +586,6 @@ async function CompareHands() {
     let activePlayers = gameState.players.filter(p => !p.HasFolded);
     await GenerateBestHand(activePlayers);
     const winner = getWinner(activePlayers);
-    //console.log("Winner inside CompareHands:", winner);
-    //console.log("Winner.BestHand:", winner.BestHand);
-    //HighlightWinningCards(winner.BestHand.contributingCards);
     return winner;
 
 }
@@ -651,8 +678,8 @@ async function evaluateHand(hands, playerName) {
     //###################################
 
     // HistInfo = { rankCounts, countsSorted, byCountThenRank }
-    // flushInfo = {isFlush, type, sortRanked}
-    //straightInfo = {isStraight, highCard, ranks}
+    // FlushInfo = {isFlush, type, sortRanked}
+    // StraightInfo = {isStraight, highCard, ranks}
 
     let BestHand = null;
 
@@ -914,13 +941,6 @@ const combinations = (n, k) => {
     return combos;
 }
 
-
-function ResetGame() {
-    console.log("RESET GAME");
-    gameState.firstToAct++;
-    gameState.betSum = 0;
-}
-
 //opcioni com : botovi koji odu u - bice izbaceni iz gamea
 function EndGame(winnerPtr, Flag) {
     let winner;
@@ -939,10 +959,6 @@ function EndGame(winnerPtr, Flag) {
     console.log("------------------------");
     console.log(winner);
     console.log("---------Debug----------");
-    console.log("Debug Bet Sum = " + gameState.betSum);
-    console.log("Debug Debt = " + winner.Debt);
-    console.log(gameState.players.filter(p => !p.HasFolded));
-
 }
 
 function AnnounceWinner(winner) {
@@ -969,16 +985,13 @@ function AnnounceWinnerFromFold(winner) {
 
 function DisableMoneyPot() {
     let moneyPot = document.getElementById("money-pot");
-    moneyPot.style.display = "none";
+    moneyPot.innerText = "";
 }
+
 
 function AnnounceHandType(winner) {
     let handType = document.getElementById("hand-type");
-    let winnerType = winner.BestHand.type;
-    if (winnerType == "Straight" || winnerType == "Royal")
-        winnerType += " Flush";
-
-    handType.textContent = "·" + winnerType + "· ";
+    handType.textContent = "·" + winner.BestHand.type + "· ";
 }
 function AnnounceFoldWin() {
     let handType = document.getElementById("hand-type");
@@ -986,7 +999,14 @@ function AnnounceFoldWin() {
 }
 
 function DisableDealerTitle() {
-    document.querySelector("#dealer-id").innerText = " ";
+    const dealer = document.querySelector("#dealer-id");
+    if (dealer) {
+        dealer.innerHTML = "";
+    }
+}
+function DeleteDealerTitle(params) {
+    const dealer = document.querySelector("#dealer-id");
+    dealer.remove();
 }
 
 //ide od igraca do igraca i tera da donesu odluku
@@ -1034,7 +1054,7 @@ function GetContributingCards(hand, type, histo) {
 function HighlightWinningCards(winner) {
     DimOverlay();
 
-   const winnerIndex = OffsetByIndex(winner);
+    const winnerIndex = OffsetByIndex(winner);
 
     const contributingCards = winner.BestHand.contributingCards;
 
@@ -1055,20 +1075,15 @@ function HighlightWinningCards(winner) {
     GoldWinnerBackgound(winnerIndex);
 }
 
-function HighlightWinningAfterFold() {
+function HighlightWinningAfterFold(winner) {
     DimOverlay();
-    let winnerIndex = OffsetByIndex();
+    let winnerIndex = OffsetByIndex(winner);
     GoldWinnerBackgound(winnerIndex);
 }
 
-function OffsetByIndex(winner = null) {
+function OffsetByIndex(winner) {
     let winnerIndex;
-    if (winner !== undefined) {
-        winnerIndex = gameState.players.findIndex(player => player === winner);
-    }
-    else {
-        winnerIndex = gameState.players.findIndex(player => !player.HasFolded);
-    }
+    winnerIndex = gameState.players.findIndex(player => player === winner);
     let idContainer = `player-${getUserID(winnerIndex)}`;
     let container = document.getElementById(idContainer);
     container.style.zIndex = 3;
@@ -1086,6 +1101,19 @@ function GoldWinnerBackgound(winnerIndex) {
     let containerUsername = document.getElementById(idUsername);
     containerUsername.style.backgroundColor = "gold";
     return;
+}
+function RemoveWinOverlay() {
+    const dimoverlay = document.querySelector(".dim-overlay")?.remove();
+    const winner = document.getElementById("winner");
+    if (winner) {
+        winner.innerText = "";
+    }
+    const hand = document.getElementById("hand-type");
+    if (hand) {
+        hand.innerText = "";
+    }
+    const exitBtn = document.getElementById("exit-btn-id")?.remove();
+    const continueBtn = document.getElementById("continue-btn-id")?.remove();
 }
 
 export { GameLoop, MonitorPlayers, }
