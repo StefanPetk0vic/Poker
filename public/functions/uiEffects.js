@@ -50,6 +50,12 @@ function UpdateMoney(userID, Money) {
 function UpdateMoneyPot(bet) {
     let id = `money-pot`;
     let moneyPot = document.getElementById(id);
+    moneyPot.textContent = "MONEY-POT: $" + bet;
+}
+
+function UpdateCurBet(bet) {
+    let id = `cur-bet-id`;
+    let moneyPot = document.getElementById(id);
     moneyPot.textContent = "BET: $" + bet;
 }
 
@@ -100,4 +106,4 @@ function ShowEndGameButtons() {
     exitBtn.addEventListener('click', ExitToStart);
 }
 
-export {ShowAction, ShowFold, ShowTurn, UpdateMoney, UpdateMoneyPot, ShowPlayerButtons, HidePlayerButtons, ShowEndGameButtons}
+export {ShowAction, ShowFold, ShowTurn, UpdateMoney, UpdateMoneyPot, UpdateCurBet, ShowPlayerButtons, HidePlayerButtons, ShowEndGameButtons}

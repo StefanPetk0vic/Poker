@@ -126,11 +126,27 @@ input {
 .money-pot {
     position: absolute;
     top: 31%;
-    left: 50%;
+    left: 58%;
     transform: translate(-50%, -50%);
     z-index: 1;
     font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     font-weight: 600;
+    font-size: 20px;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+    letter-spacing: 0.5px;
+}
+
+.cur-bet {
+    position: absolute;
+    top: 31%;
+    left: 40%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: 600;
+    font-size: 20px;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+    letter-spacing: 0.5px;
 }
 
 .timer {

@@ -13,8 +13,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <script type="module" src="script.js"></script>
-    <script type="module" src="./functions/popupController.js"></script>
+    <script type="module" src="./server/functions/gameLogic.js"></script>
+    <script type="module" src="./server/functions/script.js"></script>
+    <script type="module" src="./public/functions/popupController.js"></script>
     </link>
     <title>🃏Poker</title>
 </head>
@@ -39,6 +40,7 @@
 
                     <p class="timer">clock:</p>
                     <p class="money-pot" id="money-pot"></p>
+                    <p class="cur-bet" id="cur-bet-id"></p>
 
                     <div class="community-card-container" id="community-container-id"></div>
                     <p class="winner" id="win"></p>

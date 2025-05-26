@@ -1,4 +1,4 @@
-import { GameLoop, MonitorPlayers } from "./functions/gameLogic.js";
+import { GameLoop, MonitorPlayers } from "./gameLogic.js";
 // clubs (♣), diamonds (♦), hearts (♥) and spades (♠)
 
 document.querySelector('.start-btn').addEventListener('click', RemoveLoading);

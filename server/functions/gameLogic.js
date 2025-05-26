@@ -1,5 +1,5 @@
-import { gameState, cardObject, playerObject, getUserID, ShuffleDeck, GenerateDeck, RemoveCommunityCards } from "../script.js";
-import { CreatePlayers, RemovePlayer } from "../../addPlayers.js";
+import { gameState, cardObject, playerObject, getUserID, ShuffleDeck, GenerateDeck, RemoveCommunityCards } from "./script.js"
+import { CreatePlayers, RemovePlayer } from "../../public/functions/addPlayers.js";
 import * as uiEffects from "../../public/functions/uiEffects.js";
 import { CompareHands } from "./handEvaluator.js";
 import { AnnounceWinner, AnnounceWinnerFromFold, RemoveWinOverlay} from "../../public/functions/endScreen.js"
@@ -160,19 +160,15 @@ async function PlaceBets(FirstRound = false) {
         }
     }
 
-    //start of queue
-    let currentIndex = 0;
-    console.log("Checking currentIndex at the start with firstRound: " + currentIndex);
-
     //maxBet - the value of the current max bet
     let maxBet = 0;
 
     //lastToRaiseIndex - we track the last person to raise
     let lastToRaiseIndex = -1;
 
-    while (bettingQueue.length > 1) {
+    while (bettingQueue.length >= 1) {
         //currentPlayer - object from the arr that will be placed in the current betting
-        let currentPlayer = bettingQueue[currentIndex];
+        let currentPlayer = bettingQueue[0];
         
         const { action, amount } = await getPlayerAction(currentPlayer, maxBet, FirstRound);
         currentPlayer.hasPlayedBefore = true;
@@ -185,60 +181,69 @@ async function PlaceBets(FirstRound = false) {
                 //obrise jednog igraca na currentIndex
                 console.log("-----------------------------------");
                 console.log(
-                    `%cThe bot has folded: ${currentPlayer.UserID} | ${currentPlayer.UserID}`,
+                    `%cThe bot has folded: ${currentPlayer.UserID} | Index : ${currentPlayer.UserID}`,
                     `color: ${currentPlayer.DebugColor}; font-size: 12px;`
                 );
                 console.log("-----------------------------------");
                 console.log(" ");
-                bettingQueue.splice(currentIndex, 1);
-                if(currentIndex>=bettingQueue.length) currentIndex = 0;
+
+                bettingQueue.shift();
                 break;
             case 'call':
-                if (currentPlayer.Money >= amount) {
-                    currentPlayer.Money -= (amount - currentPlayer.Bet);
+                if(amount==0)
+                {
+                    console.log("-----------------------------------");
+                    console.log(
+                        `%cThe bot has checked: ${currentPlayer.Name} | Index: ${currentPlayer.UserID}`,
+                        `color: ${currentPlayer.DebugColor}; font-size: 12px;`
+                    ); console.log("Money: " + currentPlayer.Money);
+                    console.log("Total bet: " + currentPlayer.Bet + " | Current Max Bet: " + maxBet);
+                    console.log("-----------------------------------");
+                    console.log(" ");
+                }
+                else if (currentPlayer.Money + currentPlayer.Bet >= amount) //ima dovoljno novca
+                {
+                    let raisedBy = amount - currentPlayer.Bet;
 
+                    currentPlayer.Money -= raisedBy;
                     uiEffects.UpdateMoney(currentPlayer.UserID, currentPlayer.Money);
-
-                    currentPlayer.Bet += (amount - currentPlayer.Bet);
+                    currentPlayer.Bet += raisedBy;
+                    gameState.betSum+=raisedBy
+                    uiEffects.UpdateMoneyPot(gameState.betSum);
 
                     console.log("-----------------------------------");
                     console.log(
-                        `%cThe bot has called: ${currentPlayer.Name} | ${currentPlayer.UserID}`,
+                        `%cThe bot has called: ${currentPlayer.Name} | Index: ${currentPlayer.UserID}`,
                         `color: ${currentPlayer.DebugColor}; font-size: 12px;`
                     ); console.log("Money: " + currentPlayer.Money);
                     console.log("Total bet: " + currentPlayer.Bet + " | Current Max Bet: " + maxBet);
                     console.log("-----------------------------------");
                     console.log(" ");
 
-                    bettingQueue.splice(currentIndex, 1);
-                    if(currentIndex>=bettingQueue.length) currentIndex = 0;
-
                 }
                 else {
                     currentPlayer.HasFolded = true;
                     gameState.NumOfFolds++;
-
-                    bettingQueue.splice(currentIndex, 1);
-                    if(currentIndex>=bettingQueue.length) currentIndex = 0;
-
                 }
+                bettingQueue.shift();
                 break;
+
             case 'raise':
-                if (currentPlayer.Money >= amount) {
-                    currentPlayer.Money -= amount;
-
+                if (currentPlayer.Money + currentPlayer.Bet>= amount) //ima pare
+                {
+                    let raisedBy = amount - currentPlayer.Bet;
+                    currentPlayer.Money -= raisedBy;
                     uiEffects.UpdateMoney(currentPlayer.UserID, currentPlayer.Money);
-
-                    currentPlayer.Bet += amount;
+                    currentPlayer.Bet += raisedBy;
 
                     maxBet = currentPlayer.Bet;
+                    gameState.betSum+=raisedBy;
+                    uiEffects.UpdateCurBet(maxBet);
+                    uiEffects.UpdateMoneyPot(gameState.betSum);
 
-                    uiEffects.UpdateMoneyPot(maxBet);
-
-                    lastToRaiseIndex = currentIndex;
                     console.log("-----------------------------------");
                     console.log(
-                        `%cThe bot has raised: ${currentPlayer.Name} | ${currentPlayer.UserID}`,
+                        `%cThe bot has raised: ${currentPlayer.Name} | Index: ${currentPlayer.UserID}`,
                         `color: ${currentPlayer.DebugColor}; font-size: 12px;`
                     ); console.log("Money: " + currentPlayer.Money);
                     console.log("raised amount: " + amount);
@@ -246,16 +251,33 @@ async function PlaceBets(FirstRound = false) {
                     console.log("-----------------------------------");
                     console.log(" ");
 
-                    bettingQueue.splice(currentIndex, 1);
-                    if(currentIndex>=bettingQueue.length) currentIndex = 0;
+                    if(amount!=1 && amount!=2)
+                    {
+                        bettingQueue=[];
+                        let currentIndex=parseInt(currentPlayer.UserID);
+                        console.log("NOVI KRUG DO " + currentIndex);
+                        for(let i = 1; i<gameState.players.length; i++)
+                        {
+                            let ind = currentIndex+i;
+                            ind = ind%gameState.players.length;
+                            let player = gameState.players[(ind)];
+                            if(!player.HasFolded)
+                            {
+                                bettingQueue.push(player);
+                                console.log("DODAT " + ind);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        lastToRaiseIndex = currentPlayer.UserID;
+                        bettingQueue.shift();
+                    }
 
                 }
                 else {
                     currentPlayer.HasFolded = true;
                     gameState.NumOfFolds++;
-
-                    bettingQueue.splice(currentIndex, 1);
-                    if(currentIndex>=bettingQueue.length) currentIndex = 0;
                 }
                 break;
         }
@@ -265,22 +287,18 @@ async function PlaceBets(FirstRound = false) {
         if (everyonePlayedOnce && allMatched )
             break;
 
+        gameState.players.forEach(player =>
+        {
+            player.hasPlayedBefore=false;
+        })
+
     }
+    gameState.players.forEach(player =>
+    {
+        player.Bet=0;
+    })
 };
 
-function getNextActiveIndex(startIndex, players)
-{
-    const len = players.length;
-    for(let i = 0; i<len; i++)
-    {
-        const index = (startIndex+i)%len;
-        if(!players[index].HasFolded)
-        {
-            return index;
-        }
-    }
-    return -1;
-}
 
 function getPlayerAction(player, maxBet, FirstRound) {
     return new Promise(resolve => {
@@ -304,23 +322,27 @@ function getPlayerAction(player, maxBet, FirstRound) {
                     resolve({ action: callActions[2], amount: 0 });
                 }
 
-                uiEffects.ShowAction('Call', player.UserID);
+                if(maxBet==0)
+                {
+                    uiEffects.ShowAction('Check', player.UserID);
+                }
+                else
+                {
+                    uiEffects.ShowAction('Call', player.UserID);
+                }
+
                 setTimeout(() => { resolve({ action: callActions[1], amount: maxBet }); }, RoundSpeed());
             }
             if (action === 'raise') {
 
-                let maxTotalBet = Math.min(player.Money, maxBet + 50);
-
-                let amount = Math.floor(Math.pow(Math.random(), 2) * (maxTotalBet - maxBet)) + maxBet + 1;
-
-                amount = Math.min(amount, player.Money);
-
-                let raiseAmount = amount - maxBet;
-
+                const minRaise = maxBet+1;
+                const maxRaise = Math.min(player.Money, maxBet+50);
+                let raiseAmount = minRaise + Math.floor(Math.random()*10);
+                raiseAmount = Math.min(raiseAmount, player.Money);
                 uiEffects.ShowAction('Raise', player.UserID, raiseAmount);
 
                 setTimeout(() => {
-                    resolve({ action: callActions[0], amount: amount });
+                    resolve({ action: callActions[0], amount: raiseAmount });
                 }, RoundSpeed());
 
                 return;
@@ -460,8 +482,8 @@ function ResetGameState() {
 
 function RoundSpeed(Active = true) {
     if (Active) {
-        //return 1000 + Math.floor(Math.random() * 1500);
-        return 1000;
+        return 1000 + Math.floor(Math.random() * 1500);
+
         
     }
     return 0;
@@ -491,4 +513,4 @@ function EndGame(winnerPtr, Flag) {
     console.log("---------Debug----------");
 }
 
-export { GameLoop, MonitorPlayers, ContinueGame, ExitToStart }
+export { GameLoop, MonitorPlayers, ContinueGame, ExitToStart  }

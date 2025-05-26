@@ -1,4 +1,4 @@
-import { gameState, cardObject, playerObject, getCards, getName, getMoney, getUserID } from "../script.js";
+import { gameState, getCards, getName, getMoney, getUserID } from "../../server/functions/script.js";
 
 const positions = {
   1: { top: '85%', left: '50%' },

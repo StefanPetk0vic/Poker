@@ -1,4 +1,4 @@
-import { gameState, cardObject, playerObject, getUserID, ShuffleDeck, GenerateDeck, RemoveCommunityCards } from "../script.js";
+import { gameState, cardObject, playerObject, getUserID, ShuffleDeck, GenerateDeck, RemoveCommunityCards } from "../../server/functions/script.js";
 
 function AnnounceWinner(winner) {
 
