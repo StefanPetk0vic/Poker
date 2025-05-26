@@ -1,4 +1,4 @@
-import { ContinueGame, ExitToStart } from "./functions/gameLogic.js";
+import { ContinueGame, ExitToStart } from "../../server/functions/gameLogic.js";
 
 function ShowAction(action, userID, amount) {
     let bubbleId = `bubble-${userID}`;

@@ -1,0 +1,63 @@
+.dim-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* #0000006d is equivalent to 0.43 alpha */
+    pointer-events: none;   /* so clicks go through, optional */
+
+    z-index: 10;
+}
+
+.winner {
+    position: absolute;
+    top: 28%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 11;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: 700;
+    font-size: 28px;
+    color: gold;
+    text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.8);
+    letter-spacing: 1px;
+    animation: pop-in 0.4s ease-out;
+}
+
+.hand-type {
+    position: absolute;
+    top: 33%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 11;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-weight: 600;
+    font-size: 22px;
+    color: white;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+    letter-spacing: 0.5px;
+    animation: fade-in 0.6s ease-out;
+}
+
+@keyframes pop-in {
+    from {
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 0;
+    }
+    to {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -45%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}

@@ -96,7 +96,16 @@ function OffsetByIndex(winner) {
     return winnerIndex;
 }
 
+function RaiseCommunityCardsOverDimOverlay()
+{
+    const CommunityContainer = document.getElementById("community-container-id");
+    CommunityContainer.style.zIndex=12;
+}
+
 function DimOverlay() {
+
+    RaiseCommunityCardsOverDimOverlay();
+
     const dimoverlay = document.createElement('div');
     dimoverlay.classList.add('dim-overlay');
     document.body.appendChild(dimoverlay);

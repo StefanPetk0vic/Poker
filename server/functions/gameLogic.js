@@ -1,8 +1,8 @@
 import { gameState, cardObject, playerObject, getUserID, ShuffleDeck, GenerateDeck, RemoveCommunityCards } from "../script.js";
-import { CreatePlayers, RemovePlayer } from "../addPlayers.js";
-import * as uiEffects from "../uiEffects.js";
-import { CompareHands } from "../handEvaluator.js";
-import { AnnounceWinner, AnnounceWinnerFromFold, RemoveWinOverlay} from "../endScreen.js"
+import { CreatePlayers, RemovePlayer } from "../../addPlayers.js";
+import * as uiEffects from "../../public/functions/uiEffects.js";
+import { CompareHands } from "./handEvaluator.js";
+import { AnnounceWinner, AnnounceWinnerFromFold, RemoveWinOverlay} from "../../public/functions/endScreen.js"
 
 const _FALSE = false;
 const _TRUE = true;
@@ -148,41 +148,41 @@ async function EndCheck() {
 
 async function PlaceBets(FirstRound = false) {
 
-    //activePlayers - arr of all the players that didnt fold
-    let activePlayers = gameState.players.filter(p => !p.HasFolded);
-    //currentIndex - value based from the firstToAct variable that will be incremented to match the new SB
-    //In the 2nd and 3rd rounds the 1st player to act is the one on the left of the dealer a.k.a firstToAct
-    //let DealerFlag = activePlayers.find(p => p.UserID === "Bot#0");
-    let currentIndex = gameState.firstToAct;
+    let bettingQueue = [];
+    let index = gameState.firstToAct;
 
+    for(let i = 0; i<gameState.players.length; i++)
+    {
+        let player = gameState.players[(index+i)%gameState.players.length];
+        if(!player.HasFolded)
+        {
+            bettingQueue.push(player);
+        }
+    }
+
+    //start of queue
+    let currentIndex = 0;
     console.log("Checking currentIndex at the start with firstRound: " + currentIndex);
 
     //maxBet - the value of the current max bet
     let maxBet = 0;
-    //lastToRaiseIndex - we track the last person to raise
 
+    //lastToRaiseIndex - we track the last person to raise
     let lastToRaiseIndex = -1;
 
-    activePlayers.forEach(player => {
-        player.hasPlayedBefore = false;
-    });
-
-    while (activePlayers.length > 1) {
+    while (bettingQueue.length > 1) {
         //currentPlayer - object from the arr that will be placed in the current betting
-        const currentPlayer = activePlayers[currentIndex];
-        console.log("EVOOO MEEE U WHILE");
-        console.log(activePlayers[currentIndex]);
-        console.log("----------------------");
-        console.log(" ");
-
+        let currentPlayer = bettingQueue[currentIndex];
+        
         const { action, amount } = await getPlayerAction(currentPlayer, maxBet, FirstRound);
-
         currentPlayer.hasPlayedBefore = true;
 
         switch (action) {
             case 'fold':
                 currentPlayer.HasFolded = true;
                 gameState.NumOfFolds++;
+                
+                //obrise jednog igraca na currentIndex
                 console.log("-----------------------------------");
                 console.log(
                     `%cThe bot has folded: ${currentPlayer.UserID} | ${currentPlayer.UserID}`,
@@ -190,7 +190,8 @@ async function PlaceBets(FirstRound = false) {
                 );
                 console.log("-----------------------------------");
                 console.log(" ");
-
+                bettingQueue.splice(currentIndex, 1);
+                if(currentIndex>=bettingQueue.length) currentIndex = 0;
                 break;
             case 'call':
                 if (currentPlayer.Money >= amount) {
@@ -209,10 +210,16 @@ async function PlaceBets(FirstRound = false) {
                     console.log("-----------------------------------");
                     console.log(" ");
 
+                    bettingQueue.splice(currentIndex, 1);
+                    if(currentIndex>=bettingQueue.length) currentIndex = 0;
+
                 }
                 else {
                     currentPlayer.HasFolded = true;
                     gameState.NumOfFolds++;
+
+                    bettingQueue.splice(currentIndex, 1);
+                    if(currentIndex>=bettingQueue.length) currentIndex = 0;
 
                 }
                 break;
@@ -239,61 +246,41 @@ async function PlaceBets(FirstRound = false) {
                     console.log("-----------------------------------");
                     console.log(" ");
 
+                    bettingQueue.splice(currentIndex, 1);
+                    if(currentIndex>=bettingQueue.length) currentIndex = 0;
+
                 }
                 else {
                     currentPlayer.HasFolded = true;
                     gameState.NumOfFolds++;
+
+                    bettingQueue.splice(currentIndex, 1);
+                    if(currentIndex>=bettingQueue.length) currentIndex = 0;
                 }
                 break;
         }
 
-
-
-        //Checking again if there is still active players
-        activePlayers = gameState.players.filter(p => !p.HasFolded);
-        console.log("SOMETHING IS SUS HERE WAULTHR " + activePlayers.length);
-
-        //Check if betting is done: if the next player is the one who raised last
-        if (activePlayers.length <= 1) break;
-        if (action !== 'fold') {
-            currentIndex = currentIndex + 1;
-        } else {
-            if (currentIndex === 0) {
-                //Im changing firstToAct because im trying to keep it consistant with the left of dealer to play first
-                gameState.firstToAct = (gameState.firstToAct === 0) ? gameState.firstToAct : gameState.firstToAct - 1;
-                //TODO: a u kurac
-            }
-            if (currentIndex < lastToRaiseIndex) {
-                lastToRaiseIndex = (lastToRaiseIndex !== 0) ? lastToRaiseIndex - 1 : lastToRaiseIndex;
-            }
-        }
-        currentIndex = currentIndex % activePlayers.length;
-        console.log(" ");
-        console.log("-------------------------------");
-        console.log(`%cCheck for next playerIndex: ` + currentIndex, `color: yellow; font-size: 12px;`);
-        console.log(`%cLast to raise: ` + lastToRaiseIndex, `color: yellow; font-size: 12px;`);
-        console.log("-------------------------------");
-        console.log(" ");
-        //TODO: add a check if everyone has played at least once.
-
-        if ((currentIndex === lastToRaiseIndex)) {
-            let allMatched = activePlayers.every(p => p.Bet === maxBet);
-            if (allMatched) break;
-        }
-
-        const everyonePlayedOnce = activePlayers.every(p => p.hasPlayedBefore);
-        const allMatched = activePlayers.every(p => p.Bet === maxBet);
-        if (everyonePlayedOnce && allMatched)
+        const everyonePlayedOnce = bettingQueue.every(p => p.hasPlayedBefore);
+        const allMatched = bettingQueue.every(p => p.Bet === maxBet);
+        if (everyonePlayedOnce && allMatched )
             break;
 
     }
-
-
-    gameState.players.forEach(player => {
-        gameState.betSum += player.Bet;
-        player.Bet = 0;
-    });
 };
+
+function getNextActiveIndex(startIndex, players)
+{
+    const len = players.length;
+    for(let i = 0; i<len; i++)
+    {
+        const index = (startIndex+i)%len;
+        if(!players[index].HasFolded)
+        {
+            return index;
+        }
+    }
+    return -1;
+}
 
 function getPlayerAction(player, maxBet, FirstRound) {
     return new Promise(resolve => {
@@ -312,6 +299,8 @@ function getPlayerAction(player, maxBet, FirstRound) {
             if (action === 'call') {
                 if (maxBet - player.Bet > player.Money) {
                     console.warn(`Bot ${player.Name} | ${player.UserID} has tried to bet over his allowance. Auto-folding him`);
+                    uiEffects.ShowFold(player.UserID);
+                    uiEffects.ShowAction('Fold', player.UserID);
                     resolve({ action: callActions[2], amount: 0 });
                 }
 
@@ -446,6 +435,7 @@ function ExitToStart() {
 
 function ResetGameState() {
     gameState.firstToAct = (gameState.firstToAct + 1) % gameState.players.length;
+    console.log("first to act "+ gameState.firstToAct);
     gameState.betSum = 0;
     gameState.currentPos = 0;
     gameState.deck = [];
@@ -463,13 +453,16 @@ function ResetGameState() {
         for (let index = 0; index < player.Cards.length; index++) {
             player.Cards[index] = gameState.deck[gameState.currentPos++];
         }
+        console.log("igrac: " + player.Name);
     });
 }
 
 
 function RoundSpeed(Active = true) {
     if (Active) {
-        return 1000 + Math.floor(Math.random() * 1500);
+        //return 1000 + Math.floor(Math.random() * 1500);
+        return 1000;
+        
     }
     return 0;
 }

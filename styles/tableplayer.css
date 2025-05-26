@@ -1,0 +1,170 @@
+
+.table-player-container {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0px;
+    z-index: 8;
+    
+}
+
+.turn-glow {
+    background: radial-gradient(circle, rgba(255, 215, 0, 0.4) 0%, rgba(255, 215, 0, 0) 70%);
+}
+
+.table-player-info {
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0px;
+}
+
+.table-player-container.folded::after {
+  content: "FOLDED";
+  top: 15%;
+  font-size: 30px;
+  font-weight: 600;
+  color: #ffffff;
+  position: absolute;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7)
+}
+
+.table-player-money {
+    margin-top: 5px;
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 16px;
+    font-weight: 1000;
+    background-color: rgb(0, 0, 0);
+    color: rgb(255, 255, 255);
+    border: 3px solid black;
+    width: 110px;
+    height: 17px;
+    text-align: center;
+}
+
+.table-player-username {
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 16px;
+    font-weight: 1000;
+    background-color: rgb(233, 233, 233);
+    color: black;
+    padding-left: 20px;
+    padding-right: 20px;
+    border: 3px solid black;
+}
+
+.table-player-title {
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color:#ffffff;
+
+    width: 80px;           /* or more, depending on your longest title */
+    height: 20px;
+    text-align: center;
+    margin-top: 5px;
+}
+
+
+.table-player-card-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    width: 100%;
+    height: 70px; 
+    border-radius: 0px 0px 10px 10px;
+
+}
+
+.table-player-card-container>.cards
+{
+    width: 45px;
+    height: 70px;
+}
+
+.table-player-container.me .table-player-card-container .cards {
+    width: 55px;
+    height: 80px;
+    margin-bottom: 10px;
+}
+
+.table-player-container.me .table-player-card-container .cards .the-front {
+    font-size: 5px;
+}
+
+.table-player-container.me .table-player-card-container .cards .updown-part {
+    font-size: 2.5vh;
+    
+}
+.table-player-container.me .table-player-card-container .cards .middle-part {
+    font-size: 6vh;
+}
+
+.table-player-container.me .table-player-money {
+    width: 130px;
+}
+
+.table-player-card-container>.cards::after
+{
+    padding: 3px;
+}
+
+.table-player-card-container>.cards>.the-back {
+    font-size: 10px;
+}
+
+.table-player-card-container>.cards>.the-front {
+    font-size: 5px;
+}
+
+.table-player-card-container>.cards>.the-front>.updown-part {
+    font-size: 2vh;
+    
+}
+.table-player-card-container>.cards>.the-front>.middle-part {
+    font-size: 4vh;
+}
+
+.others-card-container {
+    display: flex;
+    flex-wrap: wrap;
+    /* allow wrapping */
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+}
+
+.others-card-container>p {
+    width: 100%;
+    /* make <p> take full width */
+    text-align: center;
+    /* optional: center text */
+}
+
+.others-card-container>.cards {
+    width: 60px;
+    height: 80px;
+}
+
+.others-card-container>.cards>.the-back {
+    font-size: 10px;
+}
+
+.others-card-container>.cards>.the-front {
+    font-size: 5px;
+}
+
+.others-card-container>.cards>.the-front>.updown-part {
+    font-size: 13.5px;
+
+}
+
+.others-card-container>.cards>.the-front>.middle-part {
+    font-size: 30px;
+    
+}

@@ -180,7 +180,11 @@ function CreateInfoContainer(ind, playerContainer)
 
 function AddDealerTitle(ind, title)
 {
-  if (getUserID(ind) == (gameState.firstToAct-1 + gameState.players.length)%gameState.players.length) {
+  const dealerPos = gameState.firstToAct-1;
+  if(dealerPos==-1)
+    dealerPos=gameState.players.length-1;
+
+  if (getUserID(ind) == dealerPos) {
     title.innerHTML = "DEALER";
     title.id = "dealer-id";
   }

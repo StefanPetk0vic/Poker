@@ -1,4 +1,0 @@
-- Player that set MaxBet plays twice in one round
-- Money after ever round stays at 1000 because we aren't passing the new values back
-- Display money next to names
-- infinite call becuase the is no LastToRaiseIndex

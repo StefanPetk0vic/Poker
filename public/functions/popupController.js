@@ -1,5 +1,5 @@
 //settings-container-id , settings-popup-id
-import { ShowCards } from "../script.js";
+import { ShowCards } from "../../script.js";
 
 function SettingsPopup() {
     let popup = CreatePopup("settings","settings-container-id", "settings-popup-id", "Settings 🛠️", true, "settings-btn-id")
