@@ -414,13 +414,6 @@ function CreateOthers(name) {
     return cards;
 }
 
-function RemoveLoading() {
-    let popupBox = document.getElementById("starting-container-id");
-    popupBox.classList.add("loading-disabled");
-    GenerateDeck();
-    ShuffleDeck();
-}
-
 function getCards(index) {
     return gameState.players[index].Cards;
 }

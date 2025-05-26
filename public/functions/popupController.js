@@ -1,5 +1,7 @@
 //settings-container-id , settings-popup-id
-import { ShowCards } from "../../script.js";
+
+//TODO: reactivate showCards() once we have accounts made "ADMIN ONLY"
+//import { ShowCards } from "../script.js";
 
 function SettingsPopup() {
     let popup = CreatePopup("settings","settings-container-id", "settings-popup-id", "Settings 🛠️", true, "settings-btn-id")
@@ -11,7 +13,7 @@ function SettingsPopup() {
             if (popupContainer) {
                 popupContainer.classList.add("loading-disabled");
             }
-            ShowCards();
+            //ShowCards();
         });
     }
 }
@@ -38,3 +40,9 @@ function CreatePopup(ClassName,ContainerID, popupID, value, buttonFlag = false, 
     body.appendChild(PopupContainer);
     return popup;
 }
+
+function RemoveLoading() {
+    let popupBox = document.getElementById("starting-container-id");
+    popupBox.classList.add("loading-disabled");
+}
+window.RemoveLoading=RemoveLoading;

@@ -1,0 +1,17 @@
+-----------------------------------
+*Script.js -> backend
+│
+├── gameLogic.js /Backend | import {A1, A2, A4, B1, B2, B3, B4 }
+│ 
+├── handEvaluator.js /Backend | import {A1, A2, A4, B1, B2, B3, B4, B5	}
+│
+├── addPlayers.js /Frontend |  import {A1, A2, A4, A5, A6, A7, B1 }
+│ 
+├── endScreen.js /Frontend | import { A1, A2, A4, B1, B2, B3, B4 }
+│   
+└── popupController.js /Frontend | import { A3 }
+
+export { gameState, cardObject, ShowCards, playerObject, getCards, getName, getMoney}; 
+export {getUserID, ShuffleDeck,GenerateDeck, RemoveCommunityCards, RemoveLoading };
+
+import { GameLoop, MonitorPlayers } from "gameLogic.js";
