@@ -1,17 +1,81 @@
 -----------------------------------
+
 *Script.js -> backend
 │
-├── gameLogic.js /Backend | import {A1, A2, A4, B1, B2, B3, B4 }
+├── gameLogic.js /Backend | import { A1, A2, A4, B1, B2, B3, B4 }
 │ 
-├── handEvaluator.js /Backend | import {A1, A2, A4, B1, B2, B3, B4, B5	}
+├── handEvaluator.js /Backend | import { A1, A2, A4, B1, B2, B3, B4}
 │
-├── addPlayers.js /Frontend |  import {A1, A2, A4, A5, A6, A7, B1 }
+├── addPlayers.js /Frontend |  import { A1, A2, A4, A5, A6, A7, B1 }
 │ 
 ├── endScreen.js /Frontend | import { A1, A2, A4, B1, B2, B3, B4 }
 │   
 └── popupController.js /Frontend | import { A3 }
 
 export { gameState, cardObject, ShowCards, playerObject, getCards, getName, getMoney}; 
-export {getUserID, ShuffleDeck,GenerateDeck, RemoveCommunityCards, RemoveLoading };
+export {getUserID, ShuffleDeck,GenerateDeck, RemoveCommunityCards};
 
 import { GameLoop, MonitorPlayers } from "gameLogic.js";
+
+-----------------------------------
+
+*gameLogic.js -> Backend
+
+│
+├── script.js /Backend | import { A1, A2 }
+│   
+└── uiEffects.js /Frontend | import { A3,A4 }
+
+export { GameLoop, MonitorPlayers, ContinueGame, ExitToStart }
+
+import { gameState, cardObject, playerObject, getUserID, ShuffleDeck, GenerateDeck, RemoveCommunityCards }
+import { CreatePlayers, RemovePlayer } 
+import * as uiEffects 
+import { CompareHands } 
+import { AnnounceWinner, AnnounceWinnerFromFold, RemoveWinOverlay}
+
+-----------------------------------
+
+*handEvaluator.js -> backend
+│ 
+└── gameLogic.js /Backend | import { A1 }
+
+export { CompareHands }
+
+import { gameState, cardObject, playerObject, getUserID, ShuffleDeck, GenerateDeck, RemoveCommunityCards } from "../script.js";
+
+-----------------------------------
+
+*addPlayers.js -> frontend
+│
+├── gameLogic.js /Backend | import { A1, A2 }
+│   
+└── script.js /Frontend | import { A1, A2 }
+
+export { CreatePlayers, RemovePlayer }
+
+import { gameState, cardObject, playerObject, getCards, getName, getMoney, getUserID } from "../script.js";
+
+-----------------------------------
+
+*endScreen.js -> frontend
+│   
+└──  gameLogic.js /Backend | import { A1, A2, A3 }
+
+export { AnnounceWinner, AnnounceWinnerFromFold, RemoveWinOverlay}
+
+import { gameState, cardObject, playerObject, getUserID, ShuffleDeck, GenerateDeck, RemoveCommunityCards } from "../script.js";
+
+-----------------------------------
+
+*uiEffects.js -> frontend
+│   
+└──  gameLogic.js /Backend | import { All }
+
+export {ShowAction, ShowFold, ShowTurn, UpdateMoney, UpdateMoneyPot, ShowPlayerButtons, HidePlayerButtons, ShowEndGameButtons}
+
+import { ContinueGame, ExitToStart } from "../../server/functions/gameLogic.js";
+
+-----------------------------------
+
+

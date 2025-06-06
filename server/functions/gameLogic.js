@@ -1,8 +1,5 @@
-import { gameState, cardObject, playerObject, getUserID, ShuffleDeck, GenerateDeck, RemoveCommunityCards } from "../script.js";
-import { CreatePlayers, RemovePlayer } from "../../addPlayers.js";
-import * as uiEffects from "../../public/functions/uiEffects.js";
+import { gameState, ShuffleDeck, GenerateDeck, RemoveCommunityCards } from "./script.js";
 import { CompareHands } from "./handEvaluator.js";
-import { AnnounceWinner, AnnounceWinnerFromFold, RemoveWinOverlay} from "../../public/functions/endScreen.js"
 
 const _FALSE = false;
 const _TRUE = true;

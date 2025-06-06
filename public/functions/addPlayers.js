@@ -1,4 +1,3 @@
-import { gameState, cardObject, playerObject, getCards, getName, getMoney, getUserID } from "../script.js";
 
 const positions = {
   1: { top: '85%', left: '50%' },
@@ -216,5 +215,3 @@ function AdjustZIndex(index)
 
 //dim na 10
 //community na 11
-
-export { CreatePlayers, RemovePlayer }

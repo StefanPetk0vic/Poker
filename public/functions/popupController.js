@@ -17,13 +17,12 @@ function SettingsPopup() {
         });
     }
 }
-window.SettingsPopup=SettingsPopup;
 function CreatePopup(ClassName,ContainerID, popupID, value, buttonFlag = false, buttonID) {
     let body = document.querySelector('body');
     let PopupContainer = document.createElement('div');
     let popup = document.createElement('div');
     let text = document.createElement('p');
-
+    
     PopupContainer.classList.add("popup-container",ClassName);
     PopupContainer.id = ContainerID;
     popup.classList.add('popup');
@@ -45,4 +44,8 @@ function RemoveLoading() {
     let popupBox = document.getElementById("starting-container-id");
     popupBox.classList.add("loading-disabled");
 }
-window.RemoveLoading=RemoveLoading;
+
+document.addEventListener("DOMContentLoaded", () => {
+    window.RemoveLoading=RemoveLoading;
+    window.SettingsPopup=SettingsPopup;
+});

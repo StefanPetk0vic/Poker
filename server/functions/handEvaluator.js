@@ -1,4 +1,4 @@
-import { gameState, cardObject, playerObject, getUserID, ShuffleDeck, GenerateDeck, RemoveCommunityCards } from "../script.js";
+import { gameState, cardObject, playerObject, getUserID, ShuffleDeck, GenerateDeck, RemoveCommunityCards } from "./script.js";
 
 const rankOrder = {
     "2": 2, "3": 3, "4": 4, "5": 5,

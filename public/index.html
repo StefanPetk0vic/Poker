@@ -12,10 +12,12 @@
     <link rel="stylesheet" href="./styles/tableplayer.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-    <script type="module" src="./functions/popupController.js"></script>
-    </link>
-    <title>🃏Poker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet"></link>
+    <title>Poker</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/styles/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/styles/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/styles/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/styles/favicon/site.webmanifest">
 </head>
 
 <body>
@@ -31,14 +33,14 @@
             <div class="others-container">
                 <p class="player-count">Players:</p>
                 
-                <button  class="game-btn" value="2" id="add-bot" onclick="AddBot(value,this.id)">Add bot</button>
+                <button  class="game-btn" value="2" id="add-bot" onclick="addBot(value,this.id)">Add bot</button>
             </div>
             <div class="game-container" id ="game-container-id">
                 <div class="poker-table">
-
+                    
                     <p class="timer">clock:</p>
                     <p class="money-pot" id="money-pot"></p>
-
+                    
                     <div class="community-card-container" id="community-container-id"></div>
                     <p class="winner" id="win"></p>
                     <div class="player-card-container" id="player-container-id">
@@ -60,7 +62,7 @@
             
         </div>
         <div class="btn-container" id="player-btn-container-id"></div>
-
+        
     </div>
     <div class="popup-container" id="starting-container-id">
         <div class="popup" id="start-popup-id">
@@ -69,5 +71,7 @@
         </div>
     </div>
     
+    <script type="module" src="/functions/popupController.js"></script>
+    <script type="module" src="/functions/addBot.js"></script>
 </body>
 </html>

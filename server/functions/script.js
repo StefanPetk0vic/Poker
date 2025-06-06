@@ -1,14 +1,11 @@
-import { GameLoop, MonitorPlayers } from "./functions/gameLogic.js";
-// clubs (♣), diamonds (♦), hearts (♥) and spades (♠)
 
-document.querySelector('.start-btn').addEventListener('click', RemoveLoading);
+// clubs (♣), diamonds (♦), hearts (♥) and spades (♠)
 
 //#region Variables
 const Types = ["♣", "♠", "♦", "♥"];
 const CardNames = ["A", "J", "Q", "K"];
-let BotNames = ["Mark", "John", "Dave", "Martin", "Bob", "Steve", "Sam", "Smith", "Sarah", "Lois", "Park", "Alex"];
 
-let gameState = {
+const gameState = {
     //Deck - collection of shuffled cards. Max 52 cards
     deck: [],
     //currentPos -saves the current position in the deck
@@ -39,7 +36,7 @@ let gameState = {
 
 //#region Classes
 class playerObject {
-    constructor(cards, money, userID, name, debt) {
+    constructor(cards, money, userID, name, debt,isBot) {
         //Money - the players total money to spend
         this.Money = money ?? 1000;
         //cards - the cards the player has in his hand
@@ -58,7 +55,7 @@ class playerObject {
         this.Bet = 0;
         //IsBot - flag used to check if a player is a bot or not
         //(used for the betting logic)
-        this.IsBot = null;
+        this.IsBot = isBot;
         this.DebugColor = GenerateColor();
 
         this.hasPlayedBefore = false;
@@ -182,15 +179,6 @@ class cardObject {
     }
 }
 
-function onPlayerJoin() {
-    //gameState.playerCount++;
-    MonitorPlayers();
-}
-
-function onPlayerLeave() {
-    //gameState.playerCount--;
-    MonitorPlayers();
-}
 //#endregion
 
 async function ShowCards() {
@@ -232,18 +220,6 @@ function ShuffleDeck() {
     for (let i = gameState.deck.length - 1; i > 0; i--) {
         let j = Math.floor(Math.random() * (i + 1));
         [gameState.deck[i], gameState.deck[j]] = [gameState.deck[j], gameState.deck[i]]
-    }
-}
-
-function DisplayCard(containerCall) {
-    let card = gameState.deck[gameState.currentPos++];
-            
-    if (gameState.currentPos < gameState.deck.length) {
-        if (containerCall) {
-            let cardContainer = document.getElementById(containerCall);
-            cardContainer.appendChild(card.element);
-        }
-        return card;
     }
 }
 
@@ -358,61 +334,8 @@ function RemoveCommunityCards() {
     communityCards.innerHTML = "";
 }
 
-function AddBot(drawNum = 0, location) {
-    let playerCount = document.querySelector(".player-count");
-
-    if (location === "add-bot") {
-        if ((gameState.playerCount - gameState.players.length + gameState.playersJoin) > 0) {
-
-            let name = BotNames[Math.floor(Math.random() * BotNames.length)];
-            RemoveBotName(name);
-
-            let cards = CreateOthers(name);// sa strane
-
-            let userID = gameState.players.length;
-            let botObj = new playerObject(cards, undefined, userID, name, undefined, undefined);
-            botObj.IsBot = true;
-            gameState.players.push(botObj);
-            playerCount.innerText = "Players: " + gameState.players.length + "/10";
-            onPlayerJoin();
-        }
-        else {
-            console.log("Max slots filled.");
-            return;
-        }
-    }
-    else {
-        console.warn("Something went wrong in bot-join.");
-        return;
-    }
-}
 
 
-function RemoveBotName(name) {
-    let index = BotNames.indexOf(name);
-    if (index !== -1) {
-        BotNames.splice(index, 1); // removes 1 element at the found index
-    }
-}
-
-function CreateOthers(name) {
-    let cards = [];
-    let Container = document.querySelector(".others-container");
-    let othersContainer = document.createElement('div');
-    othersContainer.id = 'other-container-id';
-
-    let userP = document.createElement('p');
-    userP.style.fontSize = "24px";
-    userP.innerHTML = name;
-    othersContainer.appendChild(userP);
-
-    for (let i = 0; i < 2; i++) {
-        let cardObj = DisplayCard(undefined);
-        cards.push(cardObj);
-    }
-    Container.appendChild(othersContainer);
-    return cards;
-}
 
 function getCards(index) {
     return gameState.players[index].Cards;
@@ -430,11 +353,4 @@ function getUserID(index) {
     return gameState.players[index].UserID;
 }
 
-window.RemoveLoading = RemoveLoading;
-window.AddBot = AddBot;
-window.CommunityDeal = CommunityDeal;
-window.PlayerJoin = PlayerJoin;
-window.DisplayCard = DisplayCard;
-window.ShowCards = ShowCards;
-
-export { gameState, cardObject, ShowCards, playerObject, getCards, getName, getMoney, getUserID, ShuffleDeck,GenerateDeck, RemoveCommunityCards, RemoveLoading };
+module.exports = {gameState,GenerateDeck,ShuffleDeck};
